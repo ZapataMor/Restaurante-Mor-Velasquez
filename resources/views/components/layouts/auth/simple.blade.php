@@ -72,7 +72,7 @@
             class="absolute inset-0 w-full h-full object-cover -z-10 blur-sm opacity-800" />
 
         <div
-            class="mb-25 mt-20 py-15 px-20 rounded-xl border-white/20 bg-white/30 dark:bg-zinc-900/30 backdrop-blur-md scale-up-center">
+            class="mb-20 mt-20 py-15 px-20 rounded-xl border-white/20 bg-white/30 dark:bg-zinc-900/30 backdrop-blur-md scale-up-center">
             <h1 class="text-5xl font-serif">Bienvenidos al restaurante Mor Velasquez</h1>
         </div>
 

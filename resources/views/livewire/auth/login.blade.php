@@ -1,5 +1,5 @@
 <x-layouts.auth>
-    <div class="px-10 py-5 flex flex-col gap-6">
+    <div class="px-6 md:px-10 py-5 flex flex-col gap-6">
         <x-auth-header :title="__('Inicia sesion')" :description="__('Ingresa tus credenciales')" />
 
         <x-auth-session-status class="text-center" :status="session('status')" />
@@ -15,7 +15,7 @@
                     autocomplete="current-password" :placeholder="__('Escribe tu contraseña')" viewable />
 
                 @if (Route::has('password.request'))
-                    <flux:link class="absolute top-0 text-sm end-0" :href="route('password.request')" wire:navigate>
+                    <flux:link class="absolute top-0 text-xs md:text-sm end-0" :href="route('password.request')" wire:navigate>
                         {{ __('¿Olvidaste tu contraseña?') }}
                     </flux:link>
                 @endif
@@ -31,7 +31,7 @@
         </form>
 
         @if (Route::has('register'))
-            <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400">
+            <div class="space-x-1 text-xs md:text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400">
                 <span>{{ __('¿No tienes cuenta?') }}</span>
                 <flux:link :href="route('register')" wire:navigate>{{ __('Registrarse') }}</flux:link>
             </div>

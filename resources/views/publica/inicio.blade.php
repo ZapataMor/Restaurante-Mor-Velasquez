@@ -34,6 +34,29 @@
         .fade-transition {
             transition: opacity 0.5s ease-in-out;
         }
+
+        /* Asegurar que el hero ocupe toda la pantalla */
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Prevenir saltos de línea en títulos */
+        .no-wrap-title {
+            white-space: nowrap;
+        }
+
+        /* Responsive font sizes */
+        @media (max-width: 768px) {
+            .no-wrap-title {
+                font-size: clamp(1.5rem, 8vw, 4rem);
+            }
+            .no-wrap-subtitle {
+                font-size: clamp(1rem, 4vw, 2rem);
+            }
+        }
     </style>
 
     <script>
@@ -102,28 +125,28 @@
             backdrop-blur-md shadow-sm dark:border-zinc-700">
 
             <div>
-                <h1 class="font-bold pl-8">Restaurante Mor Velasquez</h1>
+                <h1 class="font-bold pl-4 md:pl-8 text-sm md:text-base">Restaurante Mor Velasquez</h1>
             </div>
 
             <flux:spacer />
 
             <div>
                 <flux:navlist variant="outline">
-                    <flux:navlist.group class="flex space-x-4">
+                    <flux:navlist.group class="flex space-x-2 md:space-x-4">
 
-                        <div class="flex flex-col gap-1 pr-6">
+                        <div class="flex flex-col gap-1 pr-2 md:pr-6">
                             <flux:navlist.item :href="route('inicio')" :current="request()->routeIs('inicio')"
                                 wire:navigate>{{ __('Inicio') }}
                             </flux:navlist.item>
                         </div>
 
-                        <div class="flex flex-col gap-1 pr-6">
+                        <div class="flex flex-col gap-1 pr-2 md:pr-6">
                             <flux:navlist.item :href="route('carta')" :current="request()->routeIs('carta')"
                                 wire:navigate>{{ __('Carta') }}
                             </flux:navlist.item>
                         </div>
 
-                        <div class="flex flex-col gap-1 pr-6">
+                        <div class="flex flex-col gap-1 pr-2 md:pr-6">
                             <flux:navlist.item :href="route('login')" :current="request()->routeIs('login')"
                                 wire:navigate>{{ __('Login') }}
                             </flux:navlist.item>
@@ -137,27 +160,30 @@
         </flux:navbar>
     </div>
 
-    <div class="pt-70 pb-103">
-
-        <div class="border border-none rounded-4xl mx-32 py-20 bg-white/5 backdrop-blur text-center">
-            <h1 class="text-7xl font-serif text-white drop-shadow-lg tracking-in-expand-forward-top">
+    <!-- Hero Section - Full screen -->
+    <div class="hero-section px-4 md:px-32">
+        <div class="border border-none rounded-4xl w-full py-12 md:py-20 bg-white/5 backdrop-blur text-center">
+            <h1 class="text-7xl font-serif text-white drop-shadow-lg tracking-in-expand-forward-top no-wrap-title">
                 ～ Restaurante Mor Velasquez ～
             </h1>
-            <h2 class="text-3xl pt-10 font-serif tracking-in-expand-forward-top" style="animation-delay: 0.5s;">
+            <h2 class="text-3xl pt-10 font-serif tracking-in-expand-forward-top no-wrap-subtitle" style="animation-delay: 0.5s;">
                 ¡Bienvenidos a nuestro restaurante!
             </h2>
         </div>
     </div>
 
-    <div class="bg-white flex">
+    <!-- Sección de descripción con imágenes -->
+    <div class="bg-white flex flex-col md:flex-row">
 
-        <div class="flex-2 overflow-hidden">
+        <!-- Imagen superior en móvil, izquierda en desktop -->
+        <div class="flex-1 md:flex-2 overflow-hidden order-1 md:order-1">
             <img id="imagen-izquierda" src="{{ asset('images/comida.jpg') }}" alt="Fondo del contenedor"
                 class="w-full h-full object-contain scale-100 fade-transition" />
         </div>
 
-        <div class="bg-white font-serif text-center text-black text-xl w-1/4 p-4 pt-10">
-            <h1 class="text-4xl mb-4 pt-5 pb-4">El restaurante</h1>
+        <!-- Texto central -->
+        <div class="bg-white font-serif text-center text-black text-lg md:text-xl w-full md:w-1/4 p-6 md:p-4 md:pt-10 order-2 md:order-2">
+            <h1 class="text-3xl md:text-4xl mb-4 pt-5 pb-4">El restaurante</h1>
             En Restaurante Mor Velasquez, nos enorgullece ofrecerte una experiencia culinaria excepcional.
             Nuestro menú está cuidadosamente elaborado con ingredientes frescos y de alta calidad para satisfacer
             todos los paladares. Ya sea que busques platos tradicionales o sabores innovadores, nuestro equipo de
@@ -167,33 +193,37 @@
             comida!
         </div>
 
-        <div class="flex-2 overflow-hidden">
+        <!-- Imagen inferior en móvil, derecha en desktop -->
+        <div class="flex-1 md:flex-2 overflow-hidden order-3 md:order-3">
             <img id="imagen-derecha" src="{{ asset('images/comida2.jpg') }}" alt="Fondo del contenedor"
                 class="w-full h-full object-contain scale-100 fade-transition"/>
         </div>
 
     </div>
 
+    <!-- Sección de sugerencias -->
     <div class="relative overflow-hidden">
 
         <img src="{{ asset('images/comidaelegante.jpg') }}" alt="Fondo borroso" aria-hidden="true"
             class="absolute inset-0 w-full h-full object-cover blur-lg opacity-50 -z-10" />
 
-        <div class="grid grid-cols-2 pl-10 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-2 px-4 md:px-10 relative z-10">
 
-            <div class="text-center text-white text-4xl p-4 pt-20">
+            <!-- Columna de sugerencias -->
+            <div class="text-center text-white text-4xl p-4 pt-10 md:pt-20">
 
-                <h2 class="mb-8 font-serif mt-20"> Sugerencias </h2>
+                <h2 class="mb-8 font-serif mt-10 md:mt-20"> Sugerencias </h2>
 
-                <div class="grid grid-cols-2 text-2xl">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-2xl">
 
+                    <!-- Platos -->
                     <div>
-                        <div class="mb-8 pr-4">
-                            <h3 class="mb-4 bg-white/40 font-black text-black dark:text-black"> Platos </h3>
+                        <div class="mb-8 md:pr-4">
+                            <h3 class="mb-4 bg-white/40 font-black text-black dark:text-black p-2"> Platos </h3>
                         </div>
 
                         <div class="p-4 mb-6">
-                            <div class="grid grid-cols-2 text-lg mb-4">
+                            <div class="flex justify-between text-lg mb-4">
                                 <h3 class="text-left"> Tequeyoyo </h3>
                                 <h3 class="text-right text-base"> Precio: $15.99 </h3>
                             </div>
@@ -204,7 +234,7 @@
                         </div>
 
                         <div class="p-4 mb-6">
-                            <div class="grid grid-cols-2 text-lg mb-4">
+                            <div class="flex justify-between text-lg mb-4">
                                 <h3 class="text-left"> Arroz con queso </h3>
                                 <h3 class="text-right text-base"> Precio: $65.99 </h3>
                             </div>
@@ -213,7 +243,7 @@
                         </div>
 
                         <div class="p-4 mb-6">
-                            <div class="grid grid-cols-2 text-lg mb-4">
+                            <div class="flex justify-between text-lg mb-4">
                                 <h3 class="text-left"> Tajada con suero </h3>
                                 <h3 class="text-right text-base"> Precio: $80.99 </h3>
                             </div>
@@ -224,7 +254,7 @@
                         </div>
 
                         <div class="p-4 mb-6">
-                            <div class="grid grid-cols-2 text-lg mb-4">
+                            <div class="flex justify-between text-lg mb-4">
                                 <h3 class="text-left"> Yuca con queso </h3>
                                 <h3 class="text-right text-base"> Precio: $100.99 </h3>
                             </div>
@@ -235,13 +265,14 @@
 
                     </div>
 
+                    <!-- Bebidas -->
                     <div>
-                        <div class="mb-8 pl-4">
-                            <h3 class="mb-4 bg-white/40 font-black text-black dark:text-black"> Bebidas </h3>
+                        <div class="mb-8 md:pl-4">
+                            <h3 class="mb-4 bg-white/40 font-black text-black dark:text-black p-2"> Bebidas </h3>
                         </div>
 
                         <div class="p-4 mb-6">
-                            <div class="grid grid-cols-2 text-lg mb-4">
+                            <div class="flex justify-between text-lg mb-4">
                                 <h3 class="text-left"> Agua de calson </h3>
                                 <h3 class="text-right text-base"> Precio: $30.00 </h3>
                             </div>
@@ -251,7 +282,7 @@
                         </div>
 
                         <div class="p-4 mb-6">
-                            <div class="grid grid-cols-2 text-lg mb-4">
+                            <div class="flex justify-between text-lg mb-4">
                                 <h3 class="text-left"> Agua de maiz </h3>
                                 <h3 class="text-right text-base"> Precio: $73.99 </h3>
                             </div>
@@ -260,7 +291,7 @@
                         </div>
 
                         <div class="p-4 mb-6">
-                            <div class="grid grid-cols-2 text-lg mb-4">
+                            <div class="flex justify-between text-lg mb-4">
                                 <h3 class="text-left"> Jugo de corozo </h3>
                                 <h3 class="text-right text-base"> Precio: $1,000,000.99 </h3>
                             </div>
@@ -269,7 +300,7 @@
                         </div>
 
                         <div class="p-4 mb-6">
-                            <div class="grid grid-cols-2 text-lg mb-4">
+                            <div class="flex justify-between text-lg mb-4">
                                 <h3 class="text-left"> Chicha de arroz </h3>
                                 <h3 class="text-right text-base"> Precio: $10.99 </h3>
                             </div>
@@ -283,56 +314,60 @@
 
                 </div>
 
-                <div class="pb-20 mx-50">
+                <!-- Cocteles -->
+                <div class="pb-10 md:pb-20 mx-0 md:mx-50">
 
                     <div>
                         <div class="mb-8">
-                            <h3 class="mb-4 bg-white/40 font-black text-black text-2xl dark:text-black"> Cocteles </h3>
+                            <h3 class="mb-4 bg-white/40 font-black text-black text-2xl dark:text-black p-2"> Cocteles </h3>
                         </div>
 
-                        <div class="p-4 mb-6">
-                            <div class="grid grid-cols-2 text-lg mb-4">
-                                <h3 class="text-left"> Agua de calson </h3>
-                                <h3 class="text-right text-base"> Precio: $30.00 </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-4 mb-6">
+                                <div class="flex justify-between text-lg mb-4">
+                                    <h3 class="text-left"> Agua de calson </h3>
+                                    <h3 class="text-right text-base"> Precio: $30.00 </h3>
+                                </div>
+
+                                <h3 class="text-sm text-left"> Descripcion: Para enamorar a cualquier pelagato por ahi.
+                                </h3>
                             </div>
 
-                            <h3 class="text-sm text-left"> Descripcion: Para enamorar a cualquier pelagato por ahi.
-                            </h3>
-                        </div>
+                            <div class="p-4 mb-6">
+                                <div class="flex justify-between text-lg mb-4">
+                                    <h3 class="text-left"> Agua de maiz </h3>
+                                    <h3 class="text-right text-base"> Precio: $73.99 </h3>
+                                </div>
 
-                        <div class="p-4 mb-6">
-                            <div class="grid grid-cols-2 text-lg mb-4">
-                                <h3 class="text-left"> Agua de maiz </h3>
-                                <h3 class="text-right text-base"> Precio: $73.99 </h3>
+                                <h3 class="text-sm text-left"> Descripcion: Quita la sed, 100% real no fake. </h3>
                             </div>
 
-                            <h3 class="text-sm text-left"> Descripcion: Quita la sed, 100% real no fake. </h3>
-                        </div>
+                            <div class="p-4 mb-6">
+                                <div class="flex justify-between text-lg mb-4">
+                                    <h3 class="text-left"> Jugo de corozo </h3>
+                                    <h3 class="text-right text-base"> Precio: $1,000,000.99 </h3>
+                                </div>
 
-                        <div class="p-4 mb-6">
-                            <div class="grid grid-cols-2 text-lg mb-4">
-                                <h3 class="text-left"> Jugo de corozo </h3>
-                                <h3 class="text-right text-base"> Precio: $1,000,000.99 </h3>
+                                <h3 class="text-sm text-left"> Descripcion: El jugo mas sabroso de este mundo. </h3>
                             </div>
 
-                            <h3 class="text-sm text-left"> Descripcion: El jugo mas sabroso de este mundo. </h3>
-                        </div>
+                            <div class="p-4 mb-6">
+                                <div class="flex justify-between text-lg mb-4">
+                                    <h3 class="text-left"> Chicha de arroz </h3>
+                                    <h3 class="text-right text-base"> Precio: $10.99 </h3>
+                                </div>
 
-                        <div class="p-4 mb-6">
-                            <div class="grid grid-cols-2 text-lg mb-4">
-                                <h3 class="text-left"> Chicha de arroz </h3>
-                                <h3 class="text-right text-base"> Precio: $10.99 </h3>
+                                <h3 class="text-sm text-left"> Descripcion: La hacen los wayuu masticando el maiz, qle
+                                    diarrea
+                                    asegurada. </h3>
                             </div>
-
-                            <h3 class="text-sm text-left"> Descripcion: La hacen los wayuu masticando el maiz, qle
-                                diarrea
-                                asegurada. </h3>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="m-10">
+            <!-- Imagen al lado (solo visible en pantallas grandes) -->
+            <div class="m-10 hidden lg:block">
                 <img src="{{ asset('images/comidaelegante.jpg') }}" alt="Fondo del contenedor"
                     class="w-full h-full object-contain scale-90" />
             </div>
