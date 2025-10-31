@@ -1,32 +1,34 @@
 <?php
 
-use App\Models\User;
-use Laravel\Fortify\Features;
+// Desactivado temporalmente porque el proyecto no usa autenticación de dos factores (2FA)
 
-test('two factor challenge redirects to login when not authenticated', function () {
-    if (! Features::canManageTwoFactorAuthentication()) {
-        $this->markTestSkipped('Two-factor authentication is not enabled.');
-    }
+// use App\Models\User;
+// use Laravel\Fortify\Features;
 
-    $response = $this->get(route('two-factor.login'));
+// test('two factor challenge redirects to login when not authenticated', function () {
+//     if (! Features::canManageTwoFactorAuthentication()) {
+//         $this->markTestSkipped('Two-factor authentication is not enabled.');
+//     }
 
-    $response->assertRedirect(route('login'));
-});
+//     $response = $this->get(route('two-factor.login'));
 
-test('two factor challenge can be rendered', function () {
-    if (! Features::canManageTwoFactorAuthentication()) {
-        $this->markTestSkipped('Two-factor authentication is not enabled.');
-    }
+//     $response->assertRedirect(route('login'));
+// });
 
-    Features::twoFactorAuthentication([
-        'confirm' => true,
-        'confirmPassword' => true,
-    ]);
+// test('two factor challenge can be rendered', function () {
+//     if (! Features::canManageTwoFactorAuthentication()) {
+//         $this->markTestSkipped('Two-factor authentication is not enabled.');
+//     }
 
-    $user = User::factory()->create();
+//     Features::twoFactorAuthentication([
+//         'confirm' => true,
+//         'confirmPassword' => true,
+//     ]);
 
-    $this->post(route('login.store'), [
-        'email' => $user->email,
-        'password' => 'password',
-    ])->assertRedirect(route('two-factor.login'));
-});
+//     $user = User::factory()->create();
+
+//     $this->post(route('login.store'), [
+//         'email' => $user->email,
+//         'password' => 'password',
+//     ])->assertRedirect(route('two-factor.login'));
+// });
