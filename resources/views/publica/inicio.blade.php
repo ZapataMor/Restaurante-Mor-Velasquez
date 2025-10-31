@@ -1,379 +1,188 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('components.layouts.main')
 
-<head>
-    @include('partials.head')
+@section('title', 'Inicio')
 
-    <style>
-        /* ===== Animación personalizada ===== */
-        .tracking-in-expand-forward-top {
-            animation: tracking-in-expand-forward-top 0.8s ease-out both;
-        }
+@section('content')
 
-        @keyframes tracking-in-expand-forward-top {
-            0% {
-                letter-spacing: -0.2em;
-                transform: translateZ(-700px) translateY(-100px);
-                opacity: 0;
-            }
+    <!-- Hero principal -->
+    <section class="relative text-center text-white min-h-screen flex items-center justify-center overflow-hidden px-4 py-20 sm:py-32">
+        <!-- Imagen de fondo -->
+        <img src="{{ asset('images/Restaurante.jpg') }}" 
+            alt="Fondo elegante" 
+            class="absolute inset-0 w-full h-full object-cover brightness-50">
 
-            40% {
-                opacity: 0.6;
-            }
+        <!-- Contenido -->
+        <div class="font-serif relative z-10 w-full px-4">
+            <div class="bg-black/5 backdrop-blur-lg p-6 sm:p-8 rounded-2xl shadow-lg inline-block max-w-full overflow-x-auto">
+                <h1 class="text-[clamp(1.8rem,6vw,4rem)] md:text-[clamp(2.5rem,6vw,5rem)] mb-4 sm:mb-6 tracking-wide leading-tight text-center">
+                ∼ Bienvenidos a <span class="text-amber-400">Mor Velasquez ∼</span>
+                </h1>
 
-            100% {
-                transform: translateZ(0) translateY(0);
-                opacity: 1;
-            }
-        }
 
-        .rotate-vertical-center {
-            animation: rotate-vertical-center 1.5s ease-in-out both;
-        }
+                <p class="text-base sm:text-lg md:text-xl mb-8 sm:mb-10 leading-relaxed font-light text-gray-100">
+                    ¡Bienvanido a nuestro restaurante!
+                </p>
+                <a href="{{ route('reservas') }}" 
+                class="bg-amber-400 text-black px-6 sm:px-8 py-3 rounded-full hover:bg-amber-600 transition duration-300 inline-block">
+                    Reservar ahora
+                </a>
+            </div>
+        </div>
+    </section>
 
-        .fade-transition {
-            transition: opacity 0.5s ease-in-out;
-        }
-
-        /* Asegurar que el hero ocupe toda la pantalla */
-        .hero-section {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Prevenir saltos de línea en títulos */
-        .no-wrap-title {
-            white-space: nowrap;
-        }
-
-        /* Responsive font sizes */
-        @media (max-width: 768px) {
-            .no-wrap-title {
-                font-size: clamp(1.5rem, 8vw, 4rem);
-            }
-            .no-wrap-subtitle {
-                font-size: clamp(1rem, 4vw, 2rem);
-            }
-        }
-    </style>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Arreglo de imágenes para la imagen izquierda
-            const imagenesIzquierda = [
-                "{{ asset('images/comida.jpg') }}",
-                "{{ asset('images/comida2.jpg') }}",
-            ];
-
-            // Arreglo de imágenes para la imagen derecha
-            const imagenesDerecha = [
-                "{{ asset('images/comida2.jpg') }}",
-                "{{ asset('images/comida.jpg') }}"
-            ];
-
-            let indiceActual = 0;
-            const imagenIzquierda = document.getElementById('imagen-izquierda');
-            const imagenDerecha = document.getElementById('imagen-derecha');
-
-            function cambiarYGirarImagenes() {
-                // Fade out
-                imagenIzquierda.style.opacity = '0';
-                imagenDerecha.style.opacity = '0';
-
-                setTimeout(() => {
-                    // Cambiar índice
-                    indiceActual = (indiceActual + 1) % imagenesIzquierda.length;
-
-                    // Cambiar src de las imágenes
-                    imagenIzquierda.src = imagenesIzquierda[indiceActual];
-                    imagenDerecha.src = imagenesDerecha[indiceActual];
-
-                    // Remover y volver a agregar la clase de animación para reiniciar
-                    imagenIzquierda.classList.remove('rotate-vertical-center');
-                    imagenDerecha.classList.remove('rotate-vertical-center');
-
-                    // Forzar reflow
-                    void imagenIzquierda.offsetWidth;
-                    void imagenDerecha.offsetWidth;
-
-                    // Fade in y agregar animación de rotación
-                    imagenIzquierda.style.opacity = '1';
-                    imagenDerecha.style.opacity = '1';
-                    imagenIzquierda.classList.add('rotate-vertical-center');
-                    imagenDerecha.classList.add('rotate-vertical-center');
-                }, 500); // Tiempo del fade out
-            }
-
-            // Cambiar imágenes cada 5 segundos
-            setInterval(cambiarYGirarImagenes, 5000);
-        });
-    </script>
-
-</head>
-
-<body class="min-h-screen bg-white dark:bg-zinc-800">
-
-    <img src="{{ asset('images/Restaurante.jpg') }}" alt="Restaurante Mor Velasquez"
-        class="absolute inset-0 w-full h-full object-cover -z-10" />
-
-    <div>
-        <flux:navbar
-            class="fixed top-0 left-0 w-full z-50 border-b border-white/20 
-            bg-white/30 dark:bg-zinc-900/30 
-            backdrop-blur-md shadow-sm dark:border-zinc-700">
-
-            <div>
-                <h1 class="font-bold pl-4 md:pl-8 text-sm md:text-base">Restaurante Mor Velasquez</h1>
+    <!-- Sección "El restaurante" -->
+    <section class="bg-white py-20 px-6 md:px-12">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-[1.2fr_1fr_1.2fr] gap-10 items-center">
+            
+            <!-- Imagen izquierda -->
+            <div class="flex justify-center">
+                <img src="{{ asset('images/plato-izquierda.png') }}" 
+                    alt="Plato del restaurante"
+                    class="w-full max-w-2xl rounded-xl shadow-md object-cover transition-transform duration-500 hover:scale-102">
             </div>
 
-            <flux:spacer />
-
-            <div>
-                <flux:navlist variant="outline">
-                    <flux:navlist.group class="flex space-x-2 md:space-x-4">
-
-                        <div class="flex flex-col gap-1 pr-2 md:pr-6">
-                            <flux:navlist.item :href="route('inicio')" :current="request()->routeIs('inicio')"
-                                wire:navigate>{{ __('Inicio') }}
-                            </flux:navlist.item>
-                        </div>
-
-                        <div class="flex flex-col gap-1 pr-2 md:pr-6">
-                            <flux:navlist.item :href="route('carta')" :current="request()->routeIs('carta')"
-                                wire:navigate>{{ __('Carta') }}
-                            </flux:navlist.item>
-                        </div>
-
-                        <div class="flex flex-col gap-1 pr-2 md:pr-6">
-                            <flux:navlist.item :href="route('login')" :current="request()->routeIs('login')"
-                                wire:navigate>{{ __('Login') }}
-                            </flux:navlist.item>
-                        </div>
-
-                    </flux:navlist.group>
-
-                </flux:navlist>
+            <!-- Texto central -->
+            <div class="text-center font-serif px-4">
+                <h2 class="text-3xl md:text-4xl font-semibold text-amber-400 mb-6">El restaurante</h2>
+                <p class="text-gray-700 leading-relaxed text-lg">
+                    En <span class="font-semibold text-amber-400">Restaurante Mor Velasquez</span>, 
+                    nos enorgullece ofrecerte una experiencia culinaria excepcional.  
+                    Nuestro menú está cuidadosamente elaborado con ingredientes frescos y de alta calidad 
+                    para satisfacer todos los paladares.  
+                    Ya sea que busques platos tradicionales o sabores innovadores, nuestro equipo de chefs 
+                    talentosos está listo para deleitarte con creaciones únicas.  
+                    <br><br>
+                    Ven y disfruta de un ambiente acogedor y un servicio impecable.  
+                    ¡Te esperamos para compartir momentos inolvidables alrededor de la buena comida!
+                </p>
             </div>
 
-        </flux:navbar>
-    </div>
-
-    <!-- Hero Section - Full screen -->
-    <div class="hero-section px-4 md:px-32">
-        <div class="border border-none rounded-4xl w-full py-12 md:py-20 bg-white/5 backdrop-blur text-center">
-            <h1 class="text-7xl font-serif text-white drop-shadow-lg tracking-in-expand-forward-top no-wrap-title">
-                ～ Restaurante Mor Velasquez ～
-            </h1>
-            <h2 class="text-3xl pt-10 font-serif tracking-in-expand-forward-top no-wrap-subtitle" style="animation-delay: 0.5s;">
-                ¡Bienvenidos a nuestro restaurante!
-            </h2>
+            <!-- Imagen derecha -->
+            <div class="flex justify-center">
+                <img src="{{ asset('images/plato-derecha.png') }}" 
+                    alt="Sushi o plato elegante"
+                    class="w-full max-w-2xl rounded-xl shadow-md object-cover transition-transform duration-500 hover:scale-102">
+            </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Sección de descripción con imágenes -->
-    <div class="bg-white flex flex-col md:flex-row">
+    <!-- Sección de Sugerencias -->
+    <section class="relative text-white min-h-screen py-20 px-6 md:px-12 overflow-hidden flex items-center">
+        <!-- Fondo con la misma imagen, difuminada -->
+        <img src="{{ asset('images/comidaelegante.jpg') }}" 
+            alt="Fondo elegante difuminado"
+            class="absolute inset-0 w-full h-full object-cover scale-110 blur-3xl brightness-50">
 
-        <!-- Imagen superior en móvil, izquierda en desktop -->
-        <div class="flex-1 md:flex-2 overflow-hidden order-1 md:order-1">
-            <img id="imagen-izquierda" src="{{ asset('images/comida.jpg') }}" alt="Fondo del contenedor"
-                class="w-full h-full object-contain scale-100 fade-transition" />
-        </div>
+        <!-- Capa semitransparente -->
+        <div class="absolute inset-0 bg-black/40"></div>
 
-        <!-- Texto central -->
-        <div class="bg-white font-serif text-center text-black text-lg md:text-xl w-full md:w-1/4 p-6 md:p-4 md:pt-10 order-2 md:order-2">
-            <h1 class="text-3xl md:text-4xl mb-4 pt-5 pb-4">El restaurante</h1>
-            En Restaurante Mor Velasquez, nos enorgullece ofrecerte una experiencia culinaria excepcional.
-            Nuestro menú está cuidadosamente elaborado con ingredientes frescos y de alta calidad para satisfacer
-            todos los paladares. Ya sea que busques platos tradicionales o sabores innovadores, nuestro equipo de
-            chefs talentosos está listo para deleitarte con creaciones únicas. Ven y disfruta de un ambiente
-            acogedor
-            y un servicio impecable. ¡Te esperamos para compartir momentos inolvidables alrededor de la buena
-            comida!
-        </div>
+        <!-- Contenido principal -->
+        <div class="font-serif relative z-10 max-w-7xl mx-auto grid md:grid-cols-[1.5fr_1.2fr] gap-12 items-center">
+            
+            <!-- Lista de sugerencias -->
+            <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-10 shadow-lg border border-white/10">
+                <h2 class="text-4xl md:text-5xl font-serif mb-10 text-center text-amber-400 tracking-wide">
+                    Sugerencias del Chef
+                </h2>
 
-        <!-- Imagen inferior en móvil, derecha en desktop -->
-        <div class="flex-1 md:flex-2 overflow-hidden order-3 md:order-3">
-            <img id="imagen-derecha" src="{{ asset('images/comida2.jpg') }}" alt="Fondo del contenedor"
-                class="w-full h-full object-contain scale-100 fade-transition"/>
-        </div>
-
-    </div>
-
-    <!-- Sección de sugerencias -->
-    <div class="relative overflow-hidden">
-
-        <img src="{{ asset('images/comidaelegante.jpg') }}" alt="Fondo borroso" aria-hidden="true"
-            class="absolute inset-0 w-full h-full object-cover blur-lg opacity-50 -z-10" />
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 px-4 md:px-10 relative z-10">
-
-            <!-- Columna de sugerencias -->
-            <div class="text-center text-white text-4xl p-4 pt-10 md:pt-20">
-
-                <h2 class="mb-8 font-serif mt-10 md:mt-20"> Sugerencias </h2>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-2xl">
-
+                <!-- Categorías -->
+                <div class="grid md:grid-cols-2 gap-10">
                     <!-- Platos -->
                     <div>
-                        <div class="mb-8 md:pr-4">
-                            <h3 class="mb-4 bg-white/40 font-black text-black dark:text-black p-2"> Platos </h3>
-                        </div>
-
-                        <div class="p-4 mb-6">
-                            <div class="flex justify-between text-lg mb-4">
-                                <h3 class="text-left"> Tequeyoyo </h3>
-                                <h3 class="text-right text-base"> Precio: $15.99 </h3>
-                            </div>
-
-                            <h3 class="text-sm text-left"> Descripcion: Plato tradicional hecho con ingredientes frescos
-                                y
-                                sabrosos. </h3>
-                        </div>
-
-                        <div class="p-4 mb-6">
-                            <div class="flex justify-between text-lg mb-4">
-                                <h3 class="text-left"> Arroz con queso </h3>
-                                <h3 class="text-right text-base"> Precio: $65.99 </h3>
-                            </div>
-
-                            <h3 class="text-sm text-left"> Descripcion: Cule vaina sabrosa compa. </h3>
-                        </div>
-
-                        <div class="p-4 mb-6">
-                            <div class="flex justify-between text-lg mb-4">
-                                <h3 class="text-left"> Tajada con suero </h3>
-                                <h3 class="text-right text-base"> Precio: $80.99 </h3>
-                            </div>
-
-                            <h3 class="text-sm text-left"> Descripcion: El suero bien rancio pero potente, manda pal
-                                baño.
-                            </h3>
-                        </div>
-
-                        <div class="p-4 mb-6">
-                            <div class="flex justify-between text-lg mb-4">
-                                <h3 class="text-left"> Yuca con queso </h3>
-                                <h3 class="text-right text-base"> Precio: $100.99 </h3>
-                            </div>
-
-                            <h3 class="text-sm text-left"> Descripcion: Yuca y botellon, nutritiva y para donde las
-                                burritas. </h3>
-                        </div>
-
+                        <h3 class="text-xl font-semibold text-amber-400 mb-4 text-center border-b border-white/20 pb-2 uppercase">
+                            Platos
+                        </h3>
+                        <ul class="space-y-5 text-gray-100">
+                            <li>
+                                <p class="font-semibold">Tequeyoyo <span class="float-right text-amber-400">$15.99</span></p>
+                                <p class="text-sm text-gray-300">Plato tradicional hecho con ingredientes frescos y sabrosos.</p>
+                            </li>
+                            <li>
+                                <p class="font-semibold">Arroz con queso <span class="float-right text-amber-400">$65.99</span></p>
+                                <p class="text-sm text-gray-300">Cremoso y delicioso, una joya de la casa.</p>
+                            </li>
+                            <li>
+                                <p class="font-semibold">Tajada con suero <span class="float-right text-amber-400">$80.99</span></p>
+                                <p class="text-sm text-gray-300">Un clásico costeño con toque gourmet.</p>
+                            </li>
+                            <li>
+                                <p class="font-semibold">Yuca con queso <span class="float-right text-amber-400">$100.99</span></p>
+                                <p class="text-sm text-gray-300">Dorada, crocante y con el toque justo de sabor.</p>
+                            </li>
+                        </ul>
                     </div>
 
                     <!-- Bebidas -->
                     <div>
-                        <div class="mb-8 md:pl-4">
-                            <h3 class="mb-4 bg-white/40 font-black text-black dark:text-black p-2"> Bebidas </h3>
-                        </div>
-
-                        <div class="p-4 mb-6">
-                            <div class="flex justify-between text-lg mb-4">
-                                <h3 class="text-left"> Agua de calson </h3>
-                                <h3 class="text-right text-base"> Precio: $30.00 </h3>
-                            </div>
-
-                            <h3 class="text-sm text-left"> Descripcion: Para enamorar a cualquier pelagato por ahi.
-                            </h3>
-                        </div>
-
-                        <div class="p-4 mb-6">
-                            <div class="flex justify-between text-lg mb-4">
-                                <h3 class="text-left"> Agua de maiz </h3>
-                                <h3 class="text-right text-base"> Precio: $73.99 </h3>
-                            </div>
-
-                            <h3 class="text-sm text-left"> Descripcion: Quita la sed, 100% real no fake. </h3>
-                        </div>
-
-                        <div class="p-4 mb-6">
-                            <div class="flex justify-between text-lg mb-4">
-                                <h3 class="text-left"> Jugo de corozo </h3>
-                                <h3 class="text-right text-base"> Precio: $1,000,000.99 </h3>
-                            </div>
-
-                            <h3 class="text-sm text-left"> Descripcion: El jugo mas sabroso de este mundo. </h3>
-                        </div>
-
-                        <div class="p-4 mb-6">
-                            <div class="flex justify-between text-lg mb-4">
-                                <h3 class="text-left"> Chicha de arroz </h3>
-                                <h3 class="text-right text-base"> Precio: $10.99 </h3>
-                            </div>
-
-                            <h3 class="text-sm text-left"> Descripcion: La hacen los wayuu masticando el maiz, qle
-                                diarrea
-                                asegurada. </h3>
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <!-- Cocteles -->
-                <div class="pb-10 md:pb-20 mx-0 md:mx-50">
-
-                    <div>
-                        <div class="mb-8">
-                            <h3 class="mb-4 bg-white/40 font-black text-black text-2xl dark:text-black p-2"> Cocteles </h3>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="p-4 mb-6">
-                                <div class="flex justify-between text-lg mb-4">
-                                    <h3 class="text-left"> Agua de calson </h3>
-                                    <h3 class="text-right text-base"> Precio: $30.00 </h3>
-                                </div>
-
-                                <h3 class="text-sm text-left"> Descripcion: Para enamorar a cualquier pelagato por ahi.
-                                </h3>
-                            </div>
-
-                            <div class="p-4 mb-6">
-                                <div class="flex justify-between text-lg mb-4">
-                                    <h3 class="text-left"> Agua de maiz </h3>
-                                    <h3 class="text-right text-base"> Precio: $73.99 </h3>
-                                </div>
-
-                                <h3 class="text-sm text-left"> Descripcion: Quita la sed, 100% real no fake. </h3>
-                            </div>
-
-                            <div class="p-4 mb-6">
-                                <div class="flex justify-between text-lg mb-4">
-                                    <h3 class="text-left"> Jugo de corozo </h3>
-                                    <h3 class="text-right text-base"> Precio: $1,000,000.99 </h3>
-                                </div>
-
-                                <h3 class="text-sm text-left"> Descripcion: El jugo mas sabroso de este mundo. </h3>
-                            </div>
-
-                            <div class="p-4 mb-6">
-                                <div class="flex justify-between text-lg mb-4">
-                                    <h3 class="text-left"> Chicha de arroz </h3>
-                                    <h3 class="text-right text-base"> Precio: $10.99 </h3>
-                                </div>
-
-                                <h3 class="text-sm text-left"> Descripcion: La hacen los wayuu masticando el maiz, qle
-                                    diarrea
-                                    asegurada. </h3>
-                            </div>
-                        </div>
+                        <h3 class="text-xl font-semibold text-amber-400 mb-4 text-center border-b border-white/20 pb-2 uppercase">
+                            Bebidas
+                        </h3>
+                        <ul class="space-y-5 text-gray-100">
+                            <li>
+                                <p class="font-semibold">Agua de calson <span class="float-right text-amber-400">$30.00</span></p>
+                                <p class="text-sm text-gray-300">Refrescante y única, preparada artesanalmente.</p>
+                            </li>
+                            <li>
+                                <p class="font-semibold">Agua de maíz <span class="float-right text-amber-400">$73.99</span></p>
+                                <p class="text-sm text-gray-300">Natural, ligera y perfecta para acompañar tus platos.</p>
+                            </li>
+                            <li>
+                                <p class="font-semibold">Jugo de corozo <span class="float-right text-amber-400">$25.99</span></p>
+                                <p class="text-sm text-gray-300">El sabor caribeño que no puede faltar.</p>
+                            </li>
+                            <li>
+                                <p class="font-semibold">Chicha de arroz <span class="float-right text-amber-400">$10.99</span></p>
+                                <p class="text-sm text-gray-300">Tradicional, dulce y con aroma a hogar.</p>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
 
-            <!-- Imagen al lado (solo visible en pantallas grandes) -->
-            <div class="m-10 hidden lg:block">
-                <img src="{{ asset('images/comidaelegante.jpg') }}" alt="Fondo del contenedor"
-                    class="w-full h-full object-contain scale-90" />
+            <!-- Imagen lateral más ancha y alta -->
+            <div class="hidden md:flex justify-center items-center">
+                <img src="{{ asset('images/comidaelegante.jpg') }}" 
+                    alt="Mesa elegante"
+                    class="w-[110%] h-[90vh] object-cover rounded-2xl shadow-xl border border-white/10">
             </div>
-
         </div>
-    </div>
-</body>
+    </section>
 
-</html>
+    <!-- Sección de valores -->
+    <section class="bg-neutral-50 py-20 px-6 md:px-12">
+        <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-10">
+            <div class="bg-white rounded-2xl shadow-md hover:shadow-lg transition p-8 text-center border-t-4 border-amber-600">
+                <h3 class="font-serif text-2xl text-amber-400 mb-4">Cocina Tradicional</h3>
+                <p class="text-gray-600 leading-relaxed">
+                    Sabores auténticos elaborados con ingredientes frescos, seleccionados cuidadosamente
+                    por nuestros chefs expertos.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-md hover:shadow-lg transition p-8 text-center border-t-4 border-amber-500">
+                <h3 class="font-serif text-2xl text-amber-400 mb-4">Ambiente Sofisticado</h3>
+                <p class="text-gray-600 leading-relaxed">
+                    Disfruta un entorno cálido, con detalles pensados para hacer de cada visita
+                    una experiencia memorable.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-md hover:shadow-lg transition p-8 text-center border-t-4 border-amber-400">
+                <h3 class="font-serif text-2xl text-amber-400 mb-4">Reservas Online</h3>
+                <p class="text-gray-600 leading-relaxed">
+                    Agenda tu mesa de manera rápida y sencilla. Tu próxima velada está a un clic de distancia.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección final (frase elegante) -->
+    <section class="bg-gradient-to-r from-amber-600 to-amber-400 text-white py-16 text-center">
+        <h2 class="text-3xl md:text-4xl font-serif font-semibold mb-4">Sabores que cuentan historias</h2>
+        <p class="text-lg md:text-xl font-light max-w-3xl mx-auto leading-relaxed">
+            En Mor Velasquez creemos que cada plato tiene una historia, y cada historia merece ser servida con pasión.
+        </p>
+    </section>
+
+    <x-scroll-indicator />
+@endsection

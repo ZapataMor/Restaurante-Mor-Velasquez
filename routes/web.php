@@ -17,6 +17,8 @@ Route::middleware('auth')->get('/', function () {
 
 Route::view('/', 'publica.inicio')->name('inicio');
 Route::view('carta', 'publica.carta')->name('carta');
+Route::view('/reservas', 'pages.reservas')->name('reservas');
+Route::view('/contacto', 'pages.contacto')->name('contacto');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
