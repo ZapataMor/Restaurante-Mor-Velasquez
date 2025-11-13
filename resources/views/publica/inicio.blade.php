@@ -22,7 +22,7 @@
                 <p class="text-base sm:text-lg md:text-xl mb-8 sm:mb-10 leading-relaxed font-light text-gray-100">
                     ¡Bienvanido a nuestro restaurante!
                 </p>
-                <a href="{{ route('reservas') }}" 
+                <a href="{{ route('reservas.index') }}" 
                 class="bg-amber-400 text-black px-6 sm:px-8 py-3 rounded-full hover:bg-amber-600 transition duration-300 inline-block">
                     Reservar ahora
                 </a>

@@ -17,7 +17,7 @@
         <ul class="hidden md:flex space-x-8 text-white font-medium">
             <li><a href="{{ route('inicio') }}" class="hover:text-amber-400 transition">Inicio</a></li>
             <li><a href="{{ route('carta') }}" class="hover:text-amber-400 transition">Carta</a></li>
-            <li><a href="{{ route('reservas') }}" class="hover:text-amber-400 transition">Reservas</a></li>
+            <li><a href="{{ route('reservas.index') }}" class="hover:text-amber-400 transition">Reservas</a></li>
             <li><a href="{{ route('contacto') }}" class="hover:text-amber-400 transition">Contacto</a></li>
         </ul>
     </div>
@@ -27,7 +27,7 @@
         <ul class="flex flex-col text-center py-4 space-y-2">
             <li><a href="{{ route('inicio') }}" class="block py-2 hover:text-amber-400 transition">Inicio</a></li>
             <li><a href="{{ route('carta') }}" class="block py-2 hover:text-amber-400 transition">Carta</a></li>
-            <li><a href="{{ route('reservas') }}" class="block py-2 hover:text-amber-400 transition">Reservas</a></li>
+            <li><a href="{{ route('reservas.index') }}" class="block py-2 hover:text-amber-400 transition">Reservas</a></li>
             <li><a href="{{ route('contacto') }}" class="block py-2 hover:text-amber-400 transition">Contacto</a></li>
         </ul>
     </div>

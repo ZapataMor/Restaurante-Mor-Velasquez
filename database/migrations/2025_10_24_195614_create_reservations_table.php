@@ -12,9 +12,11 @@ return new class extends Migration
             $table->id();
             $table->string('client_name');
             $table->string('client_contact');
+            $table->string('cliente_document');
             $table->dateTime('reservation_time');
             $table->integer('people_count');
-            $table->foreignId('table_id')->constrained('tables')->onDelete('cascade');
+            $table->text('notes')->nullable();
+            $table->foreignId('table_id')->constrained('tables')->onDelete('cascade')->nullable();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
