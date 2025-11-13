@@ -9,25 +9,37 @@ class Reservation extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'client_name',
-        'client_contact',
-        'cliente_document',
-        'reservation_time',
-        'people_count',
-        'table_id',
-        'notes',
-        'user_id',
+    protected $primaryKey = 'reservation_id';
+    protected $fillable = ['customer_id', 'table_id', 'reservation_date', 'number_of_people', 'status', 'reservation_payment_made'];
+
+    protected $casts = [
+        'reservation_date' => 'datetime',
     ];
 
-    // 🔗 Relaciones
-    public function table()
+    // Relaciones
+    public function customer()
     {
-        return $this->belongsTo(Table::class);
+        return $this->belongsTo(Customer::class, 'customer_id');
     }
 
-    public function user()
+    public function table()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Table::class, 'table_id');
+    }
+
+    // Scopes
+    public function scopeConfirmed($query)
+    {
+        return $query->where('status', 'Confirmada');
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('status', 'Pendiente');
+    }
+
+    public function scopeToday($query)
+    {
+        return $query->whereDate('reservation_date', today());
     }
 }

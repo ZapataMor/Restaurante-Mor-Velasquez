@@ -6,18 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up(): void
+    public function up()
     {
         Schema::create('tables', function (Blueprint $table) {
-            $table->id();
+            $table->id('table_id');
             $table->integer('number')->unique();
             $table->integer('capacity');
-            $table->enum('status', ['disponible', 'ocupada', 'reservada'])->default('disponible');
+            $table->enum('status', ['Disponible', 'Ocupada', 'Reservada', 'Necesita Limpieza'])->default('Disponible');
             $table->timestamps();
         });
     }
 
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('tables');
     }

@@ -9,16 +9,38 @@ class Product extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'name',
-        'description',
-        'price',
-        'category',
-    ];
+    protected $primaryKey = 'product_id';
+    protected $fillable = ['name', 'description', 'price', 'available'];
 
-    // 🔗 Relaciones
+    // Relaciones
     public function orderItems()
     {
-        return $this->hasMany(OrderItem::class);
+        return $this->hasMany(OrderItem::class, 'product_id');
+    }
+
+    public function recipes()
+    {
+        return $this->hasMany(Recipe::class, 'product_id');
+    }
+
+    // Scopes
+    public function scopeAvailable($query)
+    {
+        return $query->where('available', true);
+    }
+
+    public function checkAvailability()
+    {
+        $recipes = $this->recipes;
+        foreach ($recipes as $recipe) {
+            if ($recipe->ingredient->status === 'Agotado') {
+                $this->available = false;
+                $this->save();
+                return false;
+            }
+        }
+        $this->available = true;
+        $this->save();
+        return true;
     }
 }

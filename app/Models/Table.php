@@ -9,20 +9,33 @@ class Table extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'number',
-        'capacity',
-        'status',
-    ];
+    protected $primaryKey = 'table_id';
+    protected $fillable = ['number', 'capacity', 'status'];
 
-    // 🔗 Relaciones
+    // Relaciones
     public function reservations()
     {
-        return $this->hasMany(Reservation::class);
+        return $this->hasMany(Reservation::class, 'table_id');
     }
 
     public function orders()
     {
-        return $this->hasMany(Order::class);
+        return $this->hasMany(Order::class, 'table_id');
+    }
+
+    // Scopes
+    public function scopeAvailable($query)
+    {
+        return $query->where('status', 'Disponible');
+    }
+
+    public function scopeOccupied($query)
+    {
+        return $query->where('status', 'Ocupada');
+    }
+
+    public function scopeReserved($query)
+    {
+        return $query->where('status', 'Reservada');
     }
 }

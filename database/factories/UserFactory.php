@@ -24,14 +24,14 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
+            'role' => $this->faker->randomElement(['Administrador', 'Recepcionista', 'Mesero', 'Chef']),
+            'name' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
+            'phone' => $this->faker->phoneNumber(),
             'email_verified_at' => now(),
-            'password' => bcrypt('password'),
+            'password' => static::$password ??= Hash::make('password'),
+            'active' => true,
             'remember_token' => Str::random(10),
-            'two_factor_secret' => Str::random(10),
-            'two_factor_recovery_codes' => Str::random(10),
-            'two_factor_confirmed_at' => now(),
         ];
     }
 
@@ -45,15 +45,44 @@ class UserFactory extends Factory
         ]);
     }
 
-    /**
-     * Indicate that the model does not have two-factor authentication configured.
-     */
-    public function withoutTwoFactor(): static
+    // States para roles específicos
+    public function admin(): static
     {
         return $this->state(fn (array $attributes) => [
-            'two_factor_secret' => null,
-            'two_factor_recovery_codes' => null,
-            'two_factor_confirmed_at' => null,
+            'role' => 'Administrador',
+            'name' => $this->faker->name() . ' (Admin)',
+        ]);
+    }
+
+    public function receptionist(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'Recepcionista',
+            'name' => $this->faker->name() . ' (Recepcionista)',
+        ]);
+    }
+
+    public function waiter(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'Mesero',
+            'name' => $this->faker->name() . ' (Mesero)',
+        ]);
+    }
+
+    public function chef(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'Chef',
+            'name' => $this->faker->name() . ' (Chef)',
+        ]);
+    }
+
+    // State para usuario inactivo
+    public function inactive(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'active' => false,
         ]);
     }
 }
