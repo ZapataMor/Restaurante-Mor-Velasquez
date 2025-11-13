@@ -19,6 +19,7 @@
             <li><a href="{{ route('carta') }}" class="hover:text-amber-400 transition">Carta</a></li>
             <li><a href="{{ route('reservas.index') }}" class="hover:text-amber-400 transition">Reservas</a></li>
             <li><a href="{{ route('contacto') }}" class="hover:text-amber-400 transition">Contacto</a></li>
+            <li><a href="{{ route('login') }}" class="hover:text-amber-400 transition">Login</a></li>
         </ul>
     </div>
 
@@ -29,6 +30,7 @@
             <li><a href="{{ route('carta') }}" class="block py-2 hover:text-amber-400 transition">Carta</a></li>
             <li><a href="{{ route('reservas.index') }}" class="block py-2 hover:text-amber-400 transition">Reservas</a></li>
             <li><a href="{{ route('contacto') }}" class="block py-2 hover:text-amber-400 transition">Contacto</a></li>
+            <li><a href="{{ route('login') }}" class="block py-2 hover:text-amber-400 transition">Login</a></li>
         </ul>
     </div>
 

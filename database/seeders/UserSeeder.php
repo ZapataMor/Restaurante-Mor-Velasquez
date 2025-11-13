@@ -55,6 +55,15 @@ class UserSeeder extends Seeder
             'active' => true,
         ]);
 
+        User::create([
+            'name' => 'Luis Zapata',
+            'email' => 'felipe@restaurante.com',
+            'password' => 'admin1234',
+            'role' => 'Admin',
+            'phone' => '555-1004',
+            'active' => true,
+        ]);
+
         // Usuarios adicionales de prueba
         User::factory(5)->create();
     }

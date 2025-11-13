@@ -42,8 +42,7 @@ Route::prefix('consultar-reserva')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::get('admin', fn() => view('livewire.auth.login'))->name('home');
-
-Route::middleware('auth')->get('/dashboard', fn() => redirect()->route('login'))->name('login');
+Route::get('login', fn() => view('livewire.auth.login'))->name('login');
 
 Route::get('dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])

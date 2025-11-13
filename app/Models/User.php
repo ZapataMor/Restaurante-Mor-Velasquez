@@ -120,4 +120,31 @@ class User extends Authenticatable
     {
         return $this->role;
     }
+
+    // Método para obtener las iniciales del usuario
+    public function initials(): string
+    {
+        $name = trim($this->name);
+        
+        if (empty($name)) {
+            return '??';
+        }
+
+        $words = explode(' ', $name);
+        
+        if (count($words) === 1) {
+            // Si solo hay una palabra, tomar las primeras dos letras
+            return strtoupper(substr($name, 0, 2));
+        }
+
+        // Si hay múltiples palabras, tomar la primera letra de cada una (máximo 2)
+        $initials = '';
+        foreach (array_slice($words, 0, 2) as $word) {
+            if (!empty($word)) {
+                $initials .= strtoupper($word[0]);
+            }
+        }
+
+        return $initials ?: '??';
+    }
 }

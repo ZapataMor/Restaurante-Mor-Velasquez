@@ -140,3 +140,4 @@ class TableController extends Controller
         return response()->json($tables);
     }
 }
+
