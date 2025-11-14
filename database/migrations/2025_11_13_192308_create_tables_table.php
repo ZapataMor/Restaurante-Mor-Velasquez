@@ -6,10 +6,10 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    public function up(): void
     {
         Schema::create('tables', function (Blueprint $table) {
-            $table->id('table_id');
+            $table->id();
             $table->integer('number')->unique();
             $table->integer('capacity');
             $table->enum('status', ['Disponible', 'Ocupada', 'Reservada', 'Necesita Limpieza'])->default('Disponible');

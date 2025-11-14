@@ -59,7 +59,7 @@ class UserSeeder extends Seeder
             'name' => 'Luis Zapata',
             'email' => 'felipe@restaurante.com',
             'password' => 'admin1234',
-            'role' => 'Admin',
+            'role' => 'Administrador',
             'phone' => '555-1004',
             'active' => true,
         ]);

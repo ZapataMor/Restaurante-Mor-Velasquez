@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id('order_id');
-            $table->foreignId('table_id')->constrained('tables', 'table_id');
+            $table->foreignId('table_id')->constrained('tables')->onDelete('cascade');
             $table->foreignId('customer_id')->nullable()->constrained('customers', 'customer_id');
             $table->foreignId('waiter_id')->constrained('users', 'id');
             $table->enum('status', ['En Vista', 'Confirmada', 'En Preparación', 'Lista', 'Entregada', 'Pagada'])->default('En Vista');

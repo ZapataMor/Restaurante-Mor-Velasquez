@@ -74,7 +74,7 @@ class ReservationController extends Controller
     public function search(Request $request)
     {
         $request->validate(['query' => 'required|string']);
-        
+
         $query = $request->input('query');
 
         $reservas = Reservation::where('client_name', 'like', '%' . $query . '%')
@@ -89,6 +89,4 @@ class ReservationController extends Controller
 
         return view('publica.reservas.resultado', compact('reservas', 'query'));
     }
-
 }
-

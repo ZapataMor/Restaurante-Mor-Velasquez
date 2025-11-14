@@ -9,7 +9,7 @@ class Table extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'table_id';
+    protected $primaryKey = 'id';
     protected $fillable = ['number', 'capacity', 'status'];
 
     // Relaciones
