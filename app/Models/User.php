@@ -41,4 +41,56 @@ class User extends Authenticatable
     {
         return $this->hasMany(Reservation::class);
     }
+
+    public function initials()
+    {
+        $name = $this->name ?? '';
+
+        // separar el nombre por espacios
+        $parts = explode(' ', trim($name));
+
+        // tomar la primera letra de los dos primeros nombres
+        $initials = '';
+
+        if (isset($parts[0])) {
+            $initials .= strtoupper(substr($parts[0], 0, 1));
+        }
+
+        if (isset($parts[1])) {
+            $initials .= strtoupper(substr($parts[1], 0, 1));
+        }
+
+        return $initials;
+    }
+
+    /**
+     * Scope para obtener solo personal activo
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('active', true);
+    }
+
+    /**
+     * Scope para obtener solo meseros
+     */
+    public function scopeWaiters($query)
+    {
+        return $query->where('role', 'mesero');
+    }
+
+    /**
+     * Accessor para el nombre del rol en español
+     */
+    public function getRoleNameAttribute(): string
+    {
+        return match($this->role) {
+            'admin' => 'Administrador',
+            'mesero' => 'Mesero',
+            'recepcionista' => 'Recepcionista',
+            'chef' => 'Chef',
+            default => 'Empleado',
+        };
+    }
+
 }

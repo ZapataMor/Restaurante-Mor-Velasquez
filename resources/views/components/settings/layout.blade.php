@@ -3,9 +3,9 @@
         <flux:navlist>
             <flux:navlist.item :href="route('settings.profile.edit')" wire:navigate>{{ __('Profile') }}</flux:navlist.item>
             <flux:navlist.item :href="route('settings.password.edit')" wire:navigate>{{ __('Password') }}</flux:navlist.item>
-            @if (Laravel\Fortify\Features::canManageTwoFactorAuthentication())
+            {{-- @if (Laravel\Fortify\Features::canManageTwoFactorAuthentication())
                 <flux:navlist.item :href="route('settings.two-factor.show')" wire:navigate>{{ __('Two-Factor Auth') }}</flux:navlist.item>
-            @endif
+            @endif --}}
             <flux:navlist.item :href="route('settings.appearance.edit')" wire:navigate>{{ __('Appearance') }}</flux:navlist.item>
         </flux:navlist>
     </div>
