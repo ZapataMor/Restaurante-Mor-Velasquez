@@ -4,68 +4,48 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Table;
 
 class Order extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'order_id';
-    protected $fillable = ['table_id', 'customer_id', 'waiter_id', 'status', 'type'];
+    protected $fillable = [
+        'reservation_id',
+        'table_id',
+        'user_id',       // mesero
+        'status',
+        'payment_status',
+        'total_amount',
+    ];
 
-    // Relaciones
+    // Orden pertenece a una reserva (opcional)
+    public function reservation()
+    {
+        return $this->belongsTo(Reservation::class);
+    }
+
+    // Orden pertenece a un mesero
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    // Orden pertenece a una mesa
     public function table()
     {
-        return $this->belongsTo(Table::class, 'table_id');
+        return $this->belongsto(Table::class);
     }
 
-    public function customer()
-    {
-        return $this->belongsTo(Customer::class, 'customer_id');
-    }
-
-    public function waiter()
-    {
-        return $this->belongsTo(User::class, 'waiter_id');
-    }
-
+    // Orden tiene muchos items
     public function orderItems()
     {
-        return $this->hasMany(OrderItem::class, 'order_id');
+        return $this->hasMany(OrderItem::class);
     }
 
+    // Orden puede tener una factura
     public function invoice()
     {
-        return $this->hasOne(Invoice::class, 'order_id');
-    }
-
-    // Calcular total de la orden
-    public function calculateTotal()
-    {
-        $total = 0;
-        foreach ($this->orderItems as $item) {
-            $total += $item->quantity * $item->product->price;
-        }
-        return $total;
-    }
-
-    // Scopes
-    public function scopeExtra($query)
-    {
-        return $query->where('type', 'Extra');
-    }
-
-    public function scopeNormal($query)
-    {
-        return $query->where('type', 'Normal');
-    }
-
-    public function scopeInProgress($query)
-    {
-        return $query->whereIn('status', ['En Vista', 'Confirmada', 'En Preparación']);
-    }
-
-    public function scopePendingPayment($query)
-    {
-        return $query->where('status', 'Entregada');
+        return $this->hasOne(Invoice::class);
     }
 }

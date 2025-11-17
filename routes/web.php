@@ -5,11 +5,11 @@ use Laravel\Fortify\Features;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\TableController;
-use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\PublicController;
 use App\Livewire\Settings\{Appearance, Password, Profile, TwoFactor};
 
 /*
@@ -17,9 +17,9 @@ use App\Livewire\Settings\{Appearance, Password, Profile, TwoFactor};
 | 🌐 Rutas Públicas
 |--------------------------------------------------------------------------
 */
-Route::view('/', 'publica.inicio')->name('inicio');
-Route::view('/carta', 'publica.carta')->name('carta');
-Route::view('/contacto', 'pages.contacto')->name('contacto');
+Route::get('/', [PublicController::class, 'inicio'])->name('inicio');
+Route::get('/carta', [PublicController::class, 'carta'])->name('carta');
+Route::get('/contacto', [PublicController::class, 'contacto'])->name('contacto');
 
 /*
 |--------------------------------------------------------------------------
@@ -68,15 +68,24 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{order}/edit', [OrderController::class, 'edit'])->name('edit');
         Route::put('/{order}', [OrderController::class, 'update'])->name('update');
         Route::delete('/{order}', [OrderController::class, 'destroy'])->name('destroy');
-        
+
         // Cambiar estado de la orden
         Route::patch('/{order}/status', [OrderController::class, 'updateStatus'])->name('updateStatus');
-        
+
         // Vista de cocina
         Route::get('/kitchen/view', [OrderController::class, 'kitchen'])->name('kitchen');
-        
+
         // Actualizar estado de items individuales
         Route::patch('/items/{item}/status', [OrderController::class, 'updateItemStatus'])->name('items.updateStatus');
+
+        // Rutas para OrderItems
+        Route::prefix('{order}/items')->name('items.')->group(function () {
+            Route::get('/create', [OrderItemController::class, 'create'])->name('create');
+            Route::post('/', [OrderItemController::class, 'store'])->name('store');
+            Route::get('/{orderItem}/edit', [OrderItemController::class, 'edit'])->name('edit');
+            Route::put('/{orderItem}', [OrderItemController::class, 'update'])->name('update');
+            Route::delete('/{orderItem}', [OrderItemController::class, 'destroy'])->name('destroy');
+        });
     });
 
     /*
@@ -92,51 +101,15 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{table}/edit', [TableController::class, 'edit'])->name('edit');
         Route::put('/{table}', [TableController::class, 'update'])->name('update');
         Route::delete('/{table}', [TableController::class, 'destroy'])->name('destroy');
-        
-        // Mapa de mesas
-        Route::get('/map/view', [TableController::class, 'map'])->name('map');
-        
+
         // Cambiar estado
         Route::patch('/{table}/status', [TableController::class, 'updateStatus'])->name('updateStatus');
-        
-        // API para obtener mesas disponibles
+
+        // Mapa de mesas
+        Route::get('/map/view', [TableController::class, 'map'])->name('map');
+
+        // API para mesas disponibles
         Route::get('/api/available', [TableController::class, 'available'])->name('api.available');
-    });
-
-    /*
-    |--------------------------------------------------------------------------
-    | 👥 Clientes
-    |--------------------------------------------------------------------------
-    */
-    Route::prefix('customers')->name('customers.')->group(function () {
-        Route::get('/', [CustomerController::class, 'index'])->name('index');
-        Route::get('/create', [CustomerController::class, 'create'])->name('create');
-        Route::post('/', [CustomerController::class, 'store'])->name('store');
-        Route::get('/{customer}', [CustomerController::class, 'show'])->name('show');
-        Route::get('/{customer}/edit', [CustomerController::class, 'edit'])->name('edit');
-        Route::put('/{customer}', [CustomerController::class, 'update'])->name('update');
-        Route::delete('/{customer}', [CustomerController::class, 'destroy'])->name('destroy');
-        
-        // Búsqueda de clientes (para formularios)
-        Route::get('/api/search', [CustomerController::class, 'search'])->name('api.search');
-    });
-
-    /*
-    |--------------------------------------------------------------------------
-    | 📅 Reservas (Admin)
-    |--------------------------------------------------------------------------
-    */
-    Route::prefix('admin/reservations')->name('reservations.')->group(function () {
-        Route::get('/', [ReservationController::class, 'adminIndex'])->name('index');
-        Route::get('/create', [ReservationController::class, 'adminCreate'])->name('create');
-        Route::post('/', [ReservationController::class, 'adminStore'])->name('store');
-        Route::get('/{reservation}', [ReservationController::class, 'show'])->name('show');
-        Route::get('/{reservation}/edit', [ReservationController::class, 'adminEdit'])->name('edit');
-        Route::put('/{reservation}', [ReservationController::class, 'adminUpdate'])->name('update');
-        Route::delete('/{reservation}', [ReservationController::class, 'destroy'])->name('destroy');
-        
-        // Cambiar estado
-        Route::patch('/{reservation}/status', [ReservationController::class, 'updateStatus'])->name('updateStatus');
     });
 
     /*
@@ -152,28 +125,27 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{product}/edit', [ProductController::class, 'edit'])->name('edit');
         Route::put('/{product}', [ProductController::class, 'update'])->name('update');
         Route::delete('/{product}', [ProductController::class, 'destroy'])->name('destroy');
-        
+
         // Cambiar disponibilidad
         Route::patch('/{product}/toggle-availability', [ProductController::class, 'toggleAvailability'])->name('toggleAvailability');
     });
 
     /*
     |--------------------------------------------------------------------------
-    | 🥕 Ingredientes
+    | 📅 Reservas (Admin)
     |--------------------------------------------------------------------------
     */
-    Route::prefix('ingredients')->name('ingredients.')->group(function () {
-        Route::get('/', [IngredientController::class, 'index'])->name('index');
-        Route::get('/create', [IngredientController::class, 'create'])->name('create');
-        Route::post('/', [IngredientController::class, 'store'])->name('store');
-        Route::get('/{ingredient}', [IngredientController::class, 'show'])->name('show');
-        Route::get('/{ingredient}/edit', [IngredientController::class, 'edit'])->name('edit');
-        Route::put('/{ingredient}', [IngredientController::class, 'update'])->name('update');
-        Route::delete('/{ingredient}', [IngredientController::class, 'destroy'])->name('destroy');
-        
-        // Movimientos de inventario
-        Route::post('/{ingredient}/movements', [IngredientController::class, 'addMovement'])->name('movements.store');
-        Route::get('/movements/history', [IngredientController::class, 'movementsHistory'])->name('movements.history');
+    Route::prefix('admin/reservations')->name('reservations.')->group(function () {
+        Route::get('/', [ReservationController::class, 'adminIndex'])->name('index');
+        Route::get('/create', [ReservationController::class, 'adminCreate'])->name('create');
+        Route::post('/', [ReservationController::class, 'adminStore'])->name('store');
+        Route::get('/{reservation}', [ReservationController::class, 'show'])->name('show');
+        Route::get('/{reservation}/edit', [ReservationController::class, 'adminEdit'])->name('edit');
+        Route::put('/{reservation}', [ReservationController::class, 'adminUpdate'])->name('update');
+        Route::delete('/{reservation}', [ReservationController::class, 'destroy'])->name('destroy');
+
+        // Cambiar estado
+        Route::patch('/{reservation}/status', [ReservationController::class, 'updateStatus'])->name('updateStatus');
     });
 
     /*
@@ -183,13 +155,9 @@ Route::middleware(['auth'])->group(function () {
     */
     Route::prefix('invoices')->name('invoices.')->group(function () {
         Route::get('/', [InvoiceController::class, 'index'])->name('index');
-        Route::get('/create', [InvoiceController::class, 'create'])->name('create');
-        Route::post('/', [InvoiceController::class, 'store'])->name('store');
+        Route::get('/create/{order}', [InvoiceController::class, 'create'])->name('create');
+        Route::post('/{order}', [InvoiceController::class, 'store'])->name('store');
         Route::get('/{invoice}', [InvoiceController::class, 'show'])->name('show');
-        Route::get('/{invoice}/print', [InvoiceController::class, 'print'])->name('print');
-        Route::get('/{invoice}/pdf', [InvoiceController::class, 'downloadPdf'])->name('pdf');
-        
-        // Procesar pago
         Route::patch('/{invoice}/pay', [InvoiceController::class, 'processPayment'])->name('pay');
     });
 
@@ -215,24 +183,6 @@ Route::middleware(['auth'])->group(function () {
                 ),
             )
             ->name('two-factor.show');
-    });
-
-    /*
-    |--------------------------------------------------------------------------
-    | 👨‍💼 Usuarios (Solo Administradores)
-    |--------------------------------------------------------------------------
-    */
-    Route::middleware(['role:Administrador'])->prefix('users')->name('users.')->group(function () {
-        Route::get('/', [UserController::class, 'index'])->name('index');
-        Route::get('/create', [UserController::class, 'create'])->name('create');
-        Route::post('/', [UserController::class, 'store'])->name('store');
-        Route::get('/{user}', [UserController::class, 'show'])->name('show');
-        Route::get('/{user}/edit', [UserController::class, 'edit'])->name('edit');
-        Route::put('/{user}', [UserController::class, 'update'])->name('update');
-        Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
-        
-        // Cambiar estado activo
-        Route::patch('/{user}/toggle-active', [UserController::class, 'toggleActive'])->name('toggleActive');
     });
 
 });

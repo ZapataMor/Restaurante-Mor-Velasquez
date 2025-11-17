@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
             'name' => 'Administrador Principal',
             'email' => 'admin@restaurante.com',
             'password' => Hash::make('password'),
-            'role' => 'Administrador',
+            'role' => 'admin',
             'phone' => '555-1001',
             'active' => true,
         ]);
@@ -23,7 +23,7 @@ class UserSeeder extends Seeder
             'name' => 'Ana García',
             'email' => 'recepcion@restaurante.com',
             'password' => Hash::make('password'),
-            'role' => 'Recepcionista',
+            'role' => 'recepcionista',
             'phone' => '555-1002',
             'active' => true,
         ]);
@@ -32,7 +32,7 @@ class UserSeeder extends Seeder
             'name' => 'Luis Rodríguez',
             'email' => 'mesero@restaurante.com',
             'password' => Hash::make('password'),
-            'role' => 'Mesero',
+            'role' => 'mesero',
             'phone' => '555-1003',
             'active' => true,
         ]);
@@ -41,7 +41,7 @@ class UserSeeder extends Seeder
             'name' => 'María López',
             'email' => 'chef@restaurante.com',
             'password' => Hash::make('password'),
-            'role' => 'Chef',
+            'role' => 'chef',
             'phone' => '555-1004',
             'active' => true,
         ]);
@@ -50,7 +50,7 @@ class UserSeeder extends Seeder
             'name' => 'Sofia Castro',
             'email' => 'mesero2@restaurante.com',
             'password' => Hash::make('password'),
-            'role' => 'Mesero',
+            'role' => 'mesero',
             'phone' => '555-1005',
             'active' => true,
         ]);
@@ -59,7 +59,7 @@ class UserSeeder extends Seeder
             'name' => 'Luis Zapata',
             'email' => 'felipe@restaurante.com',
             'password' => 'admin1234',
-            'role' => 'Administrador',
+            'role' => 'admin',
             'phone' => '555-1004',
             'active' => true,
         ]);

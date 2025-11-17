@@ -6,79 +6,63 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
- */
 class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
     protected static ?string $password;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
-            'role' => $this->faker->randomElement(['Administrador', 'Recepcionista', 'Mesero', 'Chef']),
+            'role' => $this->faker->randomElement(['admin', 'mesero', 'recepcionista', 'chef']),
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
             'phone' => $this->faker->phoneNumber(),
-            'email_verified_at' => now(),
+            // 'email_verified_at' => now(), // ❌ quitar porque NO existe en la tabla
             'password' => static::$password ??= Hash::make('password'),
             'active' => true,
             'remember_token' => Str::random(10),
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
     public function unverified(): static
     {
         return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
+            // 'email_verified_at' => null, // ❌ también sin usar
         ]);
     }
 
-    // States para roles específicos
     public function admin(): static
     {
         return $this->state(fn (array $attributes) => [
-            'role' => 'Administrador',
-            'name' => $this->faker->name() . ' (Admin)',
+            'role' => 'admin',
+            'name' => $this->faker->name() . ' (admin)',
         ]);
     }
 
     public function receptionist(): static
     {
         return $this->state(fn (array $attributes) => [
-            'role' => 'Recepcionista',
-            'name' => $this->faker->name() . ' (Recepcionista)',
+            'role' => 'recepcionista',
+            'name' => $this->faker->name() . ' (recepcionista)',
         ]);
     }
 
     public function waiter(): static
     {
         return $this->state(fn (array $attributes) => [
-            'role' => 'Mesero',
-            'name' => $this->faker->name() . ' (Mesero)',
+            'role' => 'mesero',
+            'name' => $this->faker->name() . ' (mesero)',
         ]);
     }
 
     public function chef(): static
     {
         return $this->state(fn (array $attributes) => [
-            'role' => 'Chef',
-            'name' => $this->faker->name() . ' (Chef)',
+            'role' => 'chef',
+            'name' => $this->faker->name() . ' (chef)',
         ]);
     }
 
-    // State para usuario inactivo
     public function inactive(): static
     {
         return $this->state(fn (array $attributes) => [

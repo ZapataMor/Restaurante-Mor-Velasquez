@@ -6,20 +6,43 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->id('order_id');
-            $table->foreignId('table_id')->constrained('tables')->onDelete('cascade');
-            $table->foreignId('customer_id')->nullable()->constrained('customers', 'customer_id');
-            $table->foreignId('waiter_id')->constrained('users', 'id');
-            $table->enum('status', ['En Vista', 'Confirmada', 'En Preparación', 'Lista', 'Entregada', 'Pagada'])->default('En Vista');
-            $table->enum('type', ['Normal', 'Extra'])->default('Normal');
+            $table->id();
+
+            // Orden puede provenir de una reserva (opcional)
+            $table->foreignId('reservation_id')
+                  ->nullable()
+                  ->constrained('reservations')
+                  ->nullOnDelete();
+
+            // Mesa donde se atiende al cliente
+            $table->foreignId('table_id')
+                  ->constrained('tables')
+                  ->cascadeOnDelete();
+
+            // Mesero que atiende esta orden
+            $table->foreignId('user_id')
+                  ->constrained('users')
+                  ->cascadeOnDelete();
+
+            // Estado de la orden
+            $table->enum('status', ['abierta', 'en_proceso', 'completada', 'cancelada'])
+                  ->default('abierta');
+
+            // Estado del pago
+            $table->enum('payment_status', ['pendiente', 'pagado'])
+                  ->default('pendiente');
+
+            // Total a pagar
+            $table->decimal('total_amount', 10, 2)->default(0);
+
             $table->timestamps();
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('orders');
     }

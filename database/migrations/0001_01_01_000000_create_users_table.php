@@ -13,13 +13,18 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->enum('role', ['Administrador', 'Recepcionista', 'Mesero', 'Chef'])->default('Mesero');
+
             $table->string('name');
             $table->string('email')->unique();
-            $table->string('phone')->nullable();
-            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+
+            // ENUM para roles
+            $table->enum('role', ['admin', 'mesero', 'recepcionista', 'chef'])
+                  ->default('mesero');
+
+            $table->string('phone')->nullable();
             $table->boolean('active')->default(true);
+
             $table->rememberToken();
             $table->timestamps();
         });

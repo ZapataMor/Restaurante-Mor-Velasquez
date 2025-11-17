@@ -6,19 +6,47 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
     {
         Schema::create('products', function (Blueprint $table) {
-            $table->id('product_id');
+            $table->id();
+
+            // Nombre del plato o producto
             $table->string('name');
+
+            // Categoría del producto
+            $table->enum('category', [
+                'Entrada',
+                'Plato Fuerte',
+                'Bebida',
+                'Postre',
+                'Adicional'
+            ]);
+
+            // Descripción del producto
             $table->text('description')->nullable();
+
+            // Precio del producto
             $table->decimal('price', 10, 2);
-            $table->boolean('available')->default(true);
+
+            // Imagen (ruta dentro de storage)
+            $table->string('image')->nullable();
+
+            // Estado: si aparece en el menú
+            $table->enum('status', ['Activo', 'Inactivo'])
+                  ->default('Activo');
+
             $table->timestamps();
         });
     }
 
-    public function down()
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
     {
         Schema::dropIfExists('products');
     }

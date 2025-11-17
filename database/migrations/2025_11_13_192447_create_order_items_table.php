@@ -6,20 +6,48 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    public function up(): void
     {
         Schema::create('order_items', function (Blueprint $table) {
-            $table->id('order_item_id');
-            $table->foreignId('order_id')->constrained('orders', 'order_id')->onDelete('cascade');
-            $table->foreignId('product_id')->constrained('products', 'product_id');
-            $table->integer('quantity')->default(1);
+            $table->id();
+
+            // Cada item pertenece a una orden
+            $table->foreignId('order_id')
+                ->constrained('orders')
+                ->cascadeOnDelete();
+
+            // Producto del menú
+            $table->foreignId('product_id')
+                ->constrained('products')
+                ->restrictOnDelete();
+
+            // Notas especiales para el chef
             $table->text('notes')->nullable();
-            $table->enum('status', ['Pendiente', 'En Preparación', 'Listo'])->default('Pendiente');
+
+            // Cantidad
+            $table->unsignedInteger('quantity')->default(1);
+
+            // Precio unitario del producto en el momento de la compra
+            $table->decimal('price', 10, 2);
+
+            // Total = price * quantity
+            $table->decimal('total', 10, 2);
+
+            // Estado del plato dentro del flujo de cocina
+            $table->enum('status', [
+                'pendiente',
+                'preparando',
+                'listo',
+                'servido',
+                'cancelado',
+            ])->default('pendiente');
+
+
             $table->timestamps();
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('order_items');
     }

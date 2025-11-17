@@ -2,142 +2,120 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Table;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use App\Models\Table;
 
 class TableController extends Controller
 {
-    public function index(Request $request)
+    /**
+     * Mostrar todas las mesas.
+     */
+    public function index()
     {
-        $query = Table::withCount(['orders', 'reservations']);
-
-        if ($request->has('status') && $request->status !== 'all') {
-            $query->where('status', $request->status);
-        }
-
-        $tables = $query->orderBy('number')->paginate(20);
-
-        // Estadísticas
-        $stats = [
-            'available' => Table::available()->count(),
-            'occupied' => Table::occupied()->count(),
-            'reserved' => Table::reserved()->count(),
-            'needs_cleaning' => Table::where('status', 'Necesita Limpieza')->count(),
-        ];
-
-        return view('tables.index', compact('tables', 'stats'));
+        $tables = Table::all(); // o paginación: Table::paginate(10)
+        return view('tables.index', compact('tables'));
     }
 
+    /**
+     * Mostrar formulario para crear una nueva mesa.
+     */
     public function create()
     {
         return view('tables.create');
     }
 
+    /**
+     * Guardar una nueva mesa en la base de datos.
+     */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'number' => 'required|integer|unique:tables,number',
-            'capacity' => 'required|integer|min:1|max:20',
-            'status' => 'required|in:Disponible,Ocupada,Reservada,Necesita Limpieza',
+        $request->validate([
+            'number'   => 'required|integer|unique:tables,number',
+            'capacity' => 'required|integer|min:1',
+            'status'   => 'required|in:Disponible,Ocupada,Reservada,Necesita Limpieza',
         ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
-        $table = Table::create($request->all());
+        Table::create([
+            'number'   => $request->number,
+            'capacity' => $request->capacity,
+            'status'   => $request->status,
+        ]);
 
         return redirect()->route('tables.index')
-            ->with('success', 'Mesa creada exitosamente');
+                         ->with('success', 'Mesa creada correctamente.');
     }
 
+    /**
+     * Mostrar una mesa específica.
+     */
     public function show(Table $table)
     {
-        $table->load([
-            'orders' => fn($q) => $q->latest()->take(10),
-            'reservations' => fn($q) => $q->latest()->take(10)
-        ]);
-
         return view('tables.show', compact('table'));
     }
 
+    /**
+     * Mostrar formulario para editar una mesa.
+     */
     public function edit(Table $table)
     {
         return view('tables.edit', compact('table'));
     }
 
+    /**
+     * Actualizar una mesa existente.
+     */
     public function update(Request $request, Table $table)
     {
-        $validator = Validator::make($request->all(), [
-            'number' => 'required|integer|unique:tables,number,' . $table->table_id . ',table_id',
-            'capacity' => 'required|integer|min:1|max:20',
-            'status' => 'required|in:Disponible,Ocupada,Reservada,Necesita Limpieza',
+        $request->validate([
+            'number'   => 'required|integer|unique:tables,number,' . $table->id,
+            'capacity' => 'required|integer|min:1',
+            'status'   => 'required|in:Disponible,Ocupada,Reservada,Necesita Limpieza',
         ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
-        $table->update($request->all());
+        $table->update([
+            'number'   => $request->number,
+            'capacity' => $request->capacity,
+            'status'   => $request->status,
+        ]);
 
         return redirect()->route('tables.index')
-            ->with('success', 'Mesa actualizada exitosamente');
+                         ->with('success', 'Mesa actualizada correctamente.');
     }
 
+    /**
+     * Eliminar una mesa.
+     */
     public function destroy(Table $table)
     {
-        try {
-            $table->delete();
-            return redirect()->route('tables.index')
-                ->with('success', 'Mesa eliminada exitosamente');
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'No se puede eliminar la mesa porque tiene registros asociados');
-        }
+        $table->delete();
+        return redirect()->route('tables.index')
+                         ->with('success', 'Mesa eliminada correctamente.');
     }
 
-    // Cambiar estado
-    public function updateStatus(Request $request, Table $table)
-    {
-        $validator = Validator::make($request->all(), [
-            'status' => 'required|in:Disponible,Ocupada,Reservada,Necesita Limpieza',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['error' => 'Estado inválido'], 400);
-        }
-
-        $table->status = $request->status;
-        $table->save();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Estado actualizado',
-            'status' => $table->status
-        ]);
-    }
-
-    // Vista de mapa de mesas
-    public function map()
-    {
-        $tables = Table::with(['orders' => function($q) {
-            $q->whereIn('status', ['En Vista', 'Confirmada', 'En Preparación', 'Lista', 'Entregada'])
-              ->with('waiter', 'orderItems');
-        }])->orderBy('number')->get();
-
-        return view('tables.map', compact('tables'));
-    }
-
-    // API: Obtener mesas disponibles
+    /**
+     * Filtrar mesas disponibles usando scope.
+     */
     public function available()
     {
         $tables = Table::available()->get();
-        return response()->json($tables);
+        return view('tables.index', compact('tables'));
+    }
+
+    /**
+     * Filtrar mesas ocupadas usando scope.
+     */
+    public function occupied()
+    {
+        $tables = Table::occupied()->get();
+        return view('tables.index', compact('tables'));
+    }
+
+    /**
+     * Filtrar mesas reservadas usando scope.
+     */
+    public function reserved()
+    {
+        $tables = Table::reserved()->get();
+        return view('tables.index', compact('tables'));
     }
 }
-

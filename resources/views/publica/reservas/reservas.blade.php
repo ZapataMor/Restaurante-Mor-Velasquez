@@ -70,17 +70,6 @@
 
                 <!-- Lado derecho -->
                 <div>
-                    <label class="block text-amber-400 mb-2">Ubicación / Mesa</label>
-                    <select name="table_id" required
-                        class="w-full p-3 rounded-lg bg-black/30 border border-white/20 text-white focus:ring-2 focus:ring-amber-400 outline-none">
-                        <option value="" disabled selected>Selecciona una mesa</option>
-                        @foreach ($tables as $table)
-                            <option value="{{ $table->id }}">
-                                {{ 'Mesa ' . $table->number }} - {{ $table->capacity }} personas
-                            </option>
-                        @endforeach
-                    </select>
-
                     <div class="mt-6">
                         <label class="block text-amber-400 mb-2">Notas adicionales</label>
                         <textarea name="notes" rows="6"

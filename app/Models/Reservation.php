@@ -9,30 +9,26 @@ class Reservation extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'reservation_id';
-
     protected $fillable = [
         'client_name',
         'client_contact',
         'cliente_document',
-        'reservation_time',
         'people_count',
-        'table_id',
+        'reservation_time',
+        'status',
+        'user_id', // mesero asignado (opcional)
         'notes',
-        'user_id'
     ];
 
-    protected $casts = [
-        'reservation_time' => 'datetime',
-    ];
-
-    public function table()
-    {
-        return $this->belongsTo(Table::class, 'id');
-    }
-
+    // Reserva puede tener un mesero asignado
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
+    }
+
+    // Una reserva tiene **una sola orden**
+    public function order()
+    {
+        return $this->hasOne(Order::class);
     }
 }
