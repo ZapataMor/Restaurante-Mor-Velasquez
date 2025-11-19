@@ -8,8 +8,6 @@ use App\Models\Reservation;
 use App\Models\Table;
 use App\Models\Product;
 use Illuminate\Http\Request;
-
-// IMPORTANTE
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -17,31 +15,37 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $user = Auth::user(); // <- ya funciona
+        $user = Auth::user();
 
-        // Estadísticas principales
+        // ============================
+        // 📌 Estadísticas globales
+        // ============================
         $stats = [
-            'orders_today' => Order::whereDate('created_at', today())->count(),
-            'sales_today' => Invoice::where('status', 'Pagada')
-                                    ->whereDate('created_at', today())
-                                    ->sum('total'),
+            'orders_today'       => Order::whereDate('created_at', today())->count(),
+            'sales_today'        => Invoice::where('status', 'Pagada')
+                                           ->whereDate('created_at', today())
+                                           ->sum('total'),
             'reservations_today' => Reservation::whereDate('reservation_time', today())->count(),
-            'tables_occupied' => Table::where('status', 'Ocupada')->count(),
+            'tables_occupied'    => Table::where('status', 'Ocupada')->count(),
         ];
 
-        // Órdenes activas
-        $activeOrders = Order::whereIn('status', ['Pendiente', 'En Proceso'])
+        // ============================
+        // 📌 Datos comunes
+        // ============================
+        $activeOrders = Order::whereIn('status', ['abierta', 'en_proceso'])
             ->with(['table', 'user', 'orderItems.product'])
             ->latest()
             ->get();
 
-        // Reservas próximas
-        $upcomingReservations = Reservation::where('reservation_time', '>=', now())
-            ->orderBy('reservation_time')
-            ->take(5)
+        $upcomingReservations = Reservation::where('status', 'confirmada')
+            ->where('reservation_time', '>=', now())
+            ->orderBy('reservation_time', 'asc')
             ->get();
 
-        // Productos más vendidos
+        $pendingReservations = Reservation::where('status', 'pendiente')
+            ->orderBy('reservation_time', 'asc')
+            ->get();
+
         $topProducts = DB::table('order_items')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
@@ -52,7 +56,6 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        // Ventas por día
         $salesByDay = Invoice::where('status', 'Pagada')
             ->where('created_at', '>=', now()->subDays(7))
             ->select(
@@ -64,24 +67,62 @@ class DashboardController extends Controller
             ->orderBy('date')
             ->get();
 
-        // Si es mesero = solo ve sus órdenes
-        if ($user->role === 'waiter') {
-            $myOrders = Order::where('waiter_id', $user->id)
-                ->whereIn('status', ['Pendiente', 'En Proceso'])
-                ->with(['table', 'orderItems.product'])
-                ->latest()
-                ->get();
+        // ============================
+        // 📌 Vistas por ROL
+        // ============================
 
-            return view('dashboard.waiter', compact('stats', 'myOrders', 'activeOrders'));
+        switch ($user->role) {
+
+            case 'mesero':
+                $myOrders = Order::where('user_id', $user->id)
+                    ->whereIn('status', ['abierta', 'en_proceso'])
+                    ->with(['table', 'orderItems.product'])
+                    ->latest()
+                    ->get();
+
+                $reservation = Reservation::whereDate('reservation_time', today())
+                    ->orderBy('reservation_time')
+                    ->first();
+
+                $tables = Table::all();
+
+                return view('dashboard.mesero.index', compact(
+                    'stats',
+                    'myOrders',
+                    'activeOrders',
+                    'reservation',
+                    'tables'
+                ));
+
+            case 'recepcionista':
+                // Aquí ves solo reservas + mesas
+                return view('dashboard.recepcionista.index', compact(
+                    'stats',
+                    'upcomingReservations',
+                    'pendingReservations',
+                    'activeOrders'
+                ));
+
+            case 'chef':
+                // Ejemplo: vista con órdenes en cocina
+                $kitchenOrders = Order::whereIn('status', ['en_proceso'])
+                    ->with(['table', 'orderItems.product'])
+                    ->get();
+
+                return view('dashboard.chef.index', compact(
+                    'stats',
+                    'kitchenOrders'
+                ));
+
+            case 'admin':
+            default:
+                return view('dashboard.admin.index', compact(
+                    'stats',
+                    'activeOrders',
+                    'upcomingReservations',
+                    'topProducts',
+                    'salesByDay'
+                ));
         }
-
-        // Si es admin
-        return view('dashboard.admin', compact(
-            'stats',
-            'activeOrders',
-            'upcomingReservations',
-            'topProducts',
-            'salesByDay'
-        ));
     }
 }

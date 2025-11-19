@@ -42,6 +42,26 @@ class ReservationSeeder extends Seeder
                 'notes'            => null,
             ],
             [
+                'client_name'      => 'Carlos Luquez',
+                'client_contact'   => '3025558889',
+                'cliente_document' => '1005839291',
+                'people_count'     => 6,
+                'reservation_time' => Carbon::now()->addHours(5),
+                'status'           => 'pendiente',
+                'user_id'          => null,
+                'notes'            => null,
+            ],
+            [
+                'client_name'      => 'Miguel Ramírez',
+                'client_contact'   => '3025558879',
+                'cliente_document' => '1005839271',
+                'people_count'     => 2,
+                'reservation_time' => Carbon::now()->addHours(5),
+                'status'           => 'pendiente',
+                'user_id'          => null,
+                'notes'            => null,
+            ],
+            [
                 'client_name'      => 'Laura Martínez',
                 'client_contact'   => '3124447788',
                 'cliente_document' => '1122334455',
@@ -58,6 +78,19 @@ class ReservationSeeder extends Seeder
                 'people_count'     => 5,
                 'reservation_time' => Carbon::now()->addDays(3)->setTime(21, 00),
                 'status'           => 'confirmada',
+                'user_id'          => 3,
+                'notes'            => 'Mesa amplia, clientes frecuentes.',
+            ],
+            [
+                'client_name'      => 'Pedro Torres',
+                'client_contact'   => '3157776699',
+                'cliente_document' => '1199223344',
+                'people_count'     => 5,
+
+                // Reserva para "ahora" + 30 minutos
+                'reservation_time' => Carbon::now()->addMinutes(30),
+
+                'status'           => 'pendiente',
                 'user_id'          => 3,
                 'notes'            => 'Mesa amplia, clientes frecuentes.',
             ],

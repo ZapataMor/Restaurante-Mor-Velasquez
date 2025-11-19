@@ -32,6 +32,12 @@ return new class extends Migration
                 ->constrained('users')
                 ->nullOnDelete();
 
+            // Mesa que asigna el Recepcionista
+            $table->foreignId('table_id')
+                ->nullable()
+                ->constrained('tables')
+                ->nullOnDelete();
+
             // Notas opcionales
             $table->text('notes')->nullable();
 

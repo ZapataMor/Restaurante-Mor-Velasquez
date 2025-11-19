@@ -22,6 +22,10 @@ return new class extends Migration
                   ->constrained('tables')
                   ->cascadeOnDelete();
 
+            // Cliente
+            $table->string('client_name')->nullable();
+            $table->string('client_document')->nullable();
+
             // Mesero que atiende esta orden
             $table->foreignId('user_id')
                   ->constrained('users')

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 // Importar modelo relacionado
 use App\Models\Order;
+use App\Models\Reservation;
 
 class Table extends Model
 {
@@ -23,4 +24,11 @@ class Table extends Model
     {
         return $this->hasMany(Order::class);
     }
+
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
+
 }

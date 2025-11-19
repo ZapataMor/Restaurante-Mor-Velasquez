@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Reservation;
 use Illuminate\Http\Request;
 use App\Models\Table;
 
@@ -118,4 +119,90 @@ class TableController extends Controller
         $tables = Table::reserved()->get();
         return view('tables.index', compact('tables'));
     }
+
+    public function map()
+    {
+        $now = now();
+
+        $tables = Table::with(['reservations', 'orders'])->get();
+
+        foreach ($tables as $table) {
+
+            // Buscar si tiene una reserva en ESTE MOMENTO
+            $activeReservation = $table->reservations()
+                ->where('status', 'confirmada')
+                ->whereBetween('reservation_time', [
+                    $now->copy()->subMinutes(90), // margen antes
+                    $now->copy()->addMinutes(90), // margen después
+                ])
+                ->first();
+
+            // Buscar si tiene ÓRDENES activas
+            $activeOrder = $table->orders()
+                ->whereIn('status', ['En Vista', 'Confirmada', 'En Preparación'])
+                ->exists();
+
+            // ESTADO REAL
+            if ($activeOrder) {
+                $table->status = 'Ocupada';
+
+            } elseif ($activeReservation) {
+                $table->status = 'Reservada';
+
+            } else {
+                $table->status = 'Disponible';
+            }
+        }
+
+        return view('tables.map', compact('tables'));
+    }
+
+
+   public function assign($reservationId)
+    {
+        $reservation = Reservation::findOrFail($reservationId);
+
+        // Convertir la hora a Carbon real
+        $resTime = \Carbon\Carbon::parse($reservation->reservation_time);
+
+        $tables = Table::where('capacity', '>=', $reservation->people_count)
+            ->whereDoesntHave('reservations', function ($query) use ($resTime) {
+
+                // MOSTRAR mesas que NO tengan una reserva en un rango de 2 horas
+                $query->whereBetween('reservation_time', [
+                    $resTime->copy()->subHours(2),
+                    $resTime->copy()->addHours(2),
+                ]);
+
+            })
+            ->get();
+
+        return view('tables.assign', compact('reservation', 'tables'));
+    }
+
+
+
+
+
+    public function assignStore(Request $request, $reservationId)
+    {
+        $request->validate([
+            'table_id' => 'required|exists:tables,id'
+        ]);
+
+        $reservation = Reservation::findOrFail($reservationId);
+        $table = Table::findOrFail($request->table_id);
+
+        // Actualizar reserva
+        $reservation->table_id = $table->id;
+        $reservation->status = 'confirmada';
+        $reservation->save();
+
+        return redirect()
+            ->route('dashboard')
+            ->with('success', 'Mesa asignada correctamente.');
+    }
+
+
+
 }

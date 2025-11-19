@@ -89,9 +89,9 @@ Route::middleware(['auth'])->group(function () {
     });
 
     /*
-    |--------------------------------------------------------------------------
-    | 🪑 Mesas
-    |--------------------------------------------------------------------------
+    |--------------------------------------------------------------------------  
+    | 🪑 Mesas  
+    |--------------------------------------------------------------------------  
     */
     Route::prefix('tables')->name('tables.')->group(function () {
         Route::get('/', [TableController::class, 'index'])->name('index');
@@ -107,6 +107,14 @@ Route::middleware(['auth'])->group(function () {
 
         // Mapa de mesas
         Route::get('/map/view', [TableController::class, 'map'])->name('map');
+
+        // 👉 NUEVA RUTA añadida
+        Route::get('/assign/{reservation}', [TableController::class, 'assign'])
+            ->name('assign');
+
+        Route::post('/assign/{reservation}', [TableController::class, 'assignStore'])
+            ->name('assign.store');
+
 
         // API para mesas disponibles
         Route::get('/api/available', [TableController::class, 'available'])->name('api.available');
@@ -184,5 +192,8 @@ Route::middleware(['auth'])->group(function () {
             )
             ->name('two-factor.show');
     });
+
+
+    
 
 });

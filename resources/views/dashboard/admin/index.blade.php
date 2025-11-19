@@ -98,6 +98,18 @@
                     </div>
                 </div>
             </div>
+            
+            <a href="{{ route('tables.map') }}" class="flex items-center gap-4 p-6 bg-white dark:bg-neutral-800 rounded-xl border-2 border-dashed border-neutral-300 dark:border-neutral-600 hover:border-green-500 dark:hover:border-green-500 transition-colors">
+                <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                    </svg>
+                </div>
+                <div>
+                    <p class="font-semibold">Ver Mapa de Mesas</p>
+                    <p class="text-sm text-neutral-600 dark:text-neutral-400">Estado actual del restaurante</p>
+                </div>
+            </a>
 
         </div>
 

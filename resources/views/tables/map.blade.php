@@ -78,9 +78,9 @@
                                     <div class="text-xs font-semibold mb-2">Órdenes Activas:</div>
                                     @foreach($table->orders->take(2) as $order)
                                         <div class="text-xs mb-1 p-2 bg-neutral-50 dark:bg-neutral-700 rounded">
-                                            <div class="font-medium">Orden #{{ $order->order_id }}</div>
+                                            <div class="font-medium">Orden #{{ $order->id }}</div>
                                             <div class="text-neutral-600 dark:text-neutral-400">
-                                                {{ $order->waiter->name ?? 'Sin mesero' }}
+                                                {{ $order->user->name ?? 'Sin mesero' }}
                                             </div>
                                             <div class="text-xs mt-1">
                                                 <span class="px-1 py-0.5 rounded text-white
@@ -107,7 +107,7 @@
 
                             <!-- Acciones -->
                             <div class="mt-3 flex gap-2">
-                                <a href="{{ route('tables.show', $table->table_id) }}" 
+                                <a href="{{ route('tables.show', $table->id) }}" 
                                     class="flex-1 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded px-2 py-1 text-center">
                                     Ver
                                 </a>

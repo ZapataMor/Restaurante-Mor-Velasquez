@@ -30,6 +30,7 @@ class ReservationController extends Controller
             'reservation_date' => 'required|date',
             'reservation_time' => 'required',
             'people_count'     => 'required|integer|min:1',
+            // ❌ El cliente NO asigna mesa, así que no se valida aquí
             'notes'            => 'nullable|string',
         ]);
 
@@ -45,6 +46,7 @@ class ReservationController extends Controller
             return redirect()->back()->with('error', '❌ No hay meseros disponibles para asignar.');
         }
 
+        // Crear la reserva SIN MESA por ahora
         Reservation::create([
             'client_name'      => $request->client_name,
             'client_contact'   => $request->client_contact,
@@ -52,12 +54,18 @@ class ReservationController extends Controller
             'reservation_time' => $reservationDateTime,
             'people_count'     => $request->people_count,
             'notes'            => $request->notes,
+            
+            // 🔹 Asignación automática de mesero
             'user_id'          => $mesero->id,
+
+            // ❗ La mesa queda pendiente para que el recepcionista la asigne
+            'table_id'         => null,
         ]);
 
         return redirect()->route('consultar.reserva')
-                         ->with('success', '✅ Reserva registrada correctamente.');
+                        ->with('success', '✅ Reserva registrada correctamente. Mesa pendiente por asignar.');
     }
+
 
     /**
      * 🔵 Mostrar formulario para consultar una reserva.

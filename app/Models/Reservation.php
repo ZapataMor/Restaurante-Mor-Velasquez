@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use app\Models\Table;
+
 class Reservation extends Model
 {
     use HasFactory;
@@ -31,4 +33,10 @@ class Reservation extends Model
     {
         return $this->hasOne(Order::class);
     }
+
+    public function table()
+    {
+        return $this->belongsTo(Table::class);
+    }
+
 }
