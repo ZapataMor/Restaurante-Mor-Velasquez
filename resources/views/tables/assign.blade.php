@@ -44,10 +44,11 @@
 
             </div>
 
-            <!-- Selección de mesa -->
+            <!-- Selección de mesa + mesero -->
             <form action="{{ route('tables.assign.store', $reservation->id) }}" method="POST">
                 @csrf
 
+                <!-- Selección de mesa -->
                 <h3 class="text-xl font-semibold mb-4">Selecciona una Mesa Disponible</h3>
 
                 @if($tables->isEmpty())
@@ -56,50 +57,89 @@
                     </div>
                 @else
                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mb-10">
-
                         @foreach($tables as $table)
                             <label class="cursor-pointer">
-
                                 <input type="radio" name="table_id" value="{{ $table->id }}" class="peer hidden" required>
 
-                                <div class="
-                                    border rounded-2xl p-5 text-center transition-all shadow-sm
+                                <div class="border rounded-2xl p-5 text-center transition-all shadow-sm
                                     bg-white dark:bg-neutral-800 dark:border-neutral-700
-                                    peer-checked:border-amber-500 peer-checked:bg-amber-50 dark:peer-checked:bg-amber-900/20
-                                ">
-                                    <p class="text-lg font-bold mb-1">
-                                        Mesa {{ $table->number }}
-                                    </p>
+                                    peer-checked:border-amber-500 peer-checked:bg-amber-50
+                                    dark:peer-checked:bg-amber-900/20">
 
+                                    <p class="text-lg font-bold mb-1">Mesa {{ $table->number }}</p>
                                     <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-2">
                                         Capacidad: {{ $table->capacity }}
                                     </p>
 
-                                    <span class="text-xs px-3 py-1 rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                                    <span class="text-xs px-3 py-1 rounded-full bg-green-100 text-green-800
+                                        dark:bg-green-900/30 dark:text-green-300">
                                         Disponible
                                     </span>
                                 </div>
-
                             </label>
                         @endforeach
-
                     </div>
                 @endif
+
+
+
+                <!-- Selección del mesero -->
+                <h3 class="text-xl font-semibold mb-4">Selecciona el Mesero Encargado</h3>
+
+                @if($waiters->isEmpty())
+                    <div class="p-4 bg-red-100 text-red-700 rounded-lg border border-red-300 mb-6">
+                        No hay meseros disponibles actualmente.
+                    </div>
+                @else
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mb-10">
+                        @foreach($waiters as $waiter)
+                            <label class="cursor-pointer">
+                                <!-- Aquí corregido: user_id -->
+                                <input type="radio" name="user_id" value="{{ $waiter->id }}" class="peer hidden" required>
+
+                                <div class="border rounded-2xl p-5 text-center transition-all shadow-sm
+                                    bg-white dark:bg-neutral-800 dark:border-neutral-700
+                                    peer-checked:border-blue-500 peer-checked:bg-blue-50
+                                    dark:peer-checked:bg-blue-900/20">
+
+                                    <p class="text-lg font-bold mb-1">{{ $waiter->name }}</p>
+
+                                    @if(isset($waiter->shift))
+                                    <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-2">
+                                        Turno: {{ $waiter->shift }}
+                                    </p>
+                                    @endif
+
+                                    <span class="text-xs px-3 py-1 rounded-full bg-indigo-100 text-indigo-800
+                                        dark:bg-indigo-900/30 dark:text-indigo-300">
+                                        Disponible
+                                    </span>
+                                </div>
+                            </label>
+                        @endforeach
+                    </div>
+                @endif
+
+
 
                 <!-- Botones -->
                 <div class="flex justify-end gap-3">
                     <a href="{{ route('dashboard') }}"
-                        class="px-4 py-2 rounded-xl bg-neutral-200 hover:bg-neutral-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 text-neutral-700 dark:text-neutral-200 transition">
+                    class="px-4 py-2 rounded-xl bg-neutral-200 hover:bg-neutral-300
+                    dark:bg-neutral-700 dark:hover:bg-neutral-600 text-neutral-700
+                    dark:text-neutral-200 transition">
                         Cancelar
                     </a>
 
                     <button type="submit"
-                        class="px-6 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white shadow-sm transition">
+                            class="px-6 py-2 rounded-xl bg-amber-500 hover:bg-amber-600
+                            text-white shadow-sm transition">
                         Confirmar Asignación
                     </button>
                 </div>
-
             </form>
+
+
 
         </div>
     </div>

@@ -8,21 +8,23 @@
                 @csrf
 
                 <!-- Selección de Mesa -->
-                <div class="mb-6">
+                @if($selectedTableId)
+                    <!-- Si viene table_id en la URL, lo ponemos en un input hidden -->
+                    <input type="hidden" name="table_id" value="{{ $selectedTableId }}">
+                    <p>Mesa seleccionada: {{ $tables->find($selectedTableId)->number }}</p>
+                @else
+                    <!-- Si no viene table_id, mostramos el select -->
                     <label class="block text-sm font-medium mb-2">Mesa *</label>
-                    <select name="table_id" id="table_id" required 
-                        class="w-full rounded-lg border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 px-4 py-2">
+                    <select name="table_id" required class="w-full rounded-lg ...">
                         <option value="">Seleccione una mesa</option>
                         @foreach($tables as $table)
-                            <option value="{{ $table->table_id }}">
+                            <option value="{{ $table->id }}">
                                 Mesa {{ $table->number }} - Capacidad: {{ $table->capacity }} personas
                             </option>
                         @endforeach
                     </select>
-                    @error('table_id')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
+                @endif
+
 
                 <!-- Tipo de Orden -->
                 <div class="mb-6">
@@ -43,11 +45,6 @@
                     <select name="customer_id" 
                         class="w-full rounded-lg border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 px-4 py-2">
                         <option value="">Sin cliente</option>
-                        @foreach($customers as $customer)
-                            <option value="{{ $customer->customer_id }}">
-                                {{ $customer->name }} - {{ $customer->phone }}
-                            </option>
-                        @endforeach
                     </select>
                 </div>
 
@@ -64,7 +61,7 @@
                                     <select name="items[0][product_id]" required 
                                         class="product-select w-full rounded-lg border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 px-4 py-2">
                                         <option value="">Seleccione un producto</option>
-                                        @foreach($products as $product)
+                                        @foreach($productos as $product)
                                             <option value="{{ $product->product_id }}" data-price="{{ $product->price }}">
                                                 {{ $product->name }} - ${{ number_format($product->price, 2) }}
                                             </option>
@@ -128,7 +125,7 @@
                         <select name="items[${productIndex}][product_id]" required 
                             class="product-select w-full rounded-lg border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 px-4 py-2">
                             <option value="">Seleccione un producto</option>
-                            @foreach($products as $product)
+                            @foreach($productos as $product)
                                 <option value="{{ $product->product_id }}" data-price="{{ $product->price }}">
                                     {{ $product->name }} - ${{ number_format($product->price, 2) }}
                                 </option>

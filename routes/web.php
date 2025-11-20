@@ -72,6 +72,9 @@ Route::middleware(['auth'])->group(function () {
         // Cambiar estado de la orden
         Route::patch('/{order}/status', [OrderController::class, 'updateStatus'])->name('updateStatus');
 
+        // 👉 Nueva ruta: Cerrar orden (completarla)
+        Route::patch('/{order}/close', [OrderController::class, 'close'])->name('close');
+
         // Vista de cocina
         Route::get('/kitchen/view', [OrderController::class, 'kitchen'])->name('kitchen');
 
@@ -87,6 +90,7 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/{orderItem}', [OrderItemController::class, 'destroy'])->name('destroy');
         });
     });
+
 
     /*
     |--------------------------------------------------------------------------  

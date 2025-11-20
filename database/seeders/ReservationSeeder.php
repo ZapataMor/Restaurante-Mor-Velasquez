@@ -91,7 +91,7 @@ class ReservationSeeder extends Seeder
                 'reservation_time' => Carbon::now()->addMinutes(30),
 
                 'status'           => 'pendiente',
-                'user_id'          => 3,
+                'user_id'          => null,
                 'notes'            => 'Mesa amplia, clientes frecuentes.',
             ],
         ];

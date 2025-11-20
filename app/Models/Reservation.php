@@ -22,6 +22,11 @@ class Reservation extends Model
         'notes',
     ];
 
+    protected $casts = [
+    'reservation_time' => 'datetime',
+];
+
+
     // Reserva puede tener un mesero asignado
     public function user()
     {

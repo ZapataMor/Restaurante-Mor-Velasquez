@@ -38,8 +38,6 @@ return new class extends Migration
                 'pendiente',
                 'preparando',
                 'listo',
-                'servido',
-                'cancelado',
             ])->default('pendiente');
 
 

@@ -63,7 +63,7 @@
         <!-- 🕒 Reservas Pendientes -->
         <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-700 p-6 shadow-sm">
             <h3 class="text-xl font-semibold mb-6 flex items-center gap-2">
-                Reservas Pendientes
+                Reservas Pendientes por confirmacion
                 <span class="text-sm px-3 py-1 rounded-full bg-amber-200 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
                     {{ $pendingReservations->count() }}
                 </span>
@@ -94,6 +94,60 @@
             </div>
         </div>
 
+        <!-- 📅 Reservas de hoy -->
+        <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-700 p-6 shadow-sm">
+            <h3 class="text-xl font-semibold mb-6">Reservas de hoy</h3>
+
+            <div class="space-y-4 max-h-80 overflow-y-auto pr-2">
+
+                @forelse ($todayReservations as $reservation)
+                    <div class="flex justify-between items-center p-4 bg-neutral-50 dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition">
+
+                        <!-- Izquierda -->
+                        <div>
+                            <p class="font-medium">{{ $reservation->client_name }}</p>
+                            <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                                {{ $reservation->people_count }} personas
+                            </p>
+
+                            {{-- Mesa asignada --}}
+                            <p class="text-xs mt-1 text-neutral-500 dark:text-neutral-400">
+                                🪑 Mesa:
+                                <span class="font-semibold">
+                                    {{ $reservation->table ? $reservation->table->number : 'Sin asignar' }}
+                                </span>
+                            </p>
+
+                            {{-- Mesero asignado (user_id) --}}
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                                👨‍🍳 Mesero:
+                                <span class="font-semibold">
+                                    {{ $reservation->user ? $reservation->user->name : 'Sin asignar' }}
+                                </span>
+                            </p>
+                        </div>
+
+                        <!-- Derecha: Fecha / Hora -->
+                        <div class="text-right">
+                            <p class="font-semibold">
+                                {{ \Carbon\Carbon::parse($reservation->reservation_time)->format('d M') }}
+                            </p>
+                            <p class="text-xs text-neutral-500">
+                                {{ \Carbon\Carbon::parse($reservation->reservation_time)->format('H:i') }}
+                            </p>
+                        </div>
+
+                    </div>
+
+                @empty
+                    <p class="text-center text-neutral-400 py-6">No hay reservas próximas</p>
+                @endforelse
+
+            </div>
+        </div>
+
+
+
         <!-- 📅 Próximas Reservas Confirmadas -->
         <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-700 p-6 shadow-sm">
             <h3 class="text-xl font-semibold mb-6">Próximas Reservas Confirmadas</h3>
@@ -117,30 +171,6 @@
 
             </div>
         </div>
-
-        <!-- 🍽️ Órdenes Activas -->
-        <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-700 p-6 shadow-sm">
-            <h3 class="text-xl font-semibold mb-6">Órdenes Activas</h3>
-
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @forelse ($activeOrders as $order)
-                    <div class="p-4 bg-neutral-50 dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-sm hover:shadow-md transition">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="font-semibold">Mesa {{ $order->table->number }}</span>
-                            <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-                                {{ ucfirst($order->status) }}
-                            </span>
-                        </div>
-                        <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                            {{ $order->orderItems->count() }} items
-                        </p>
-                    </div>
-                @empty
-                    <p class="col-span-3 text-center text-neutral-400 py-6">No hay órdenes activas</p>
-                @endforelse
-            </div>
-        </div>
-
     </div>
 
 </x-layouts.app>

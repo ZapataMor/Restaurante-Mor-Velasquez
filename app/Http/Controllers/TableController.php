@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
 use App\Models\Table;
+use App\Models\User;
 
 class TableController extends Controller
 {
@@ -124,29 +125,46 @@ class TableController extends Controller
     {
         $now = now();
 
+        // Carga reservas y órdenes
         $tables = Table::with(['reservations', 'orders'])->get();
 
         foreach ($tables as $table) {
 
-            // Buscar si tiene una reserva en ESTE MOMENTO
-            $activeReservation = $table->reservations()
-                ->where('status', 'confirmada')
-                ->whereBetween('reservation_time', [
-                    $now->copy()->subMinutes(90), // margen antes
-                    $now->copy()->addMinutes(90), // margen después
-                ])
-                ->first();
+            /** -------------------------------
+             * 1. RESERVA ACTIVA
+             * -------------------------------- */
+            $activeReservation = $table->activeReservation();
+            $table->activeReservation = $activeReservation;
 
-            // Buscar si tiene ÓRDENES activas
-            $activeOrder = $table->orders()
-                ->whereIn('status', ['En Vista', 'Confirmada', 'En Preparación'])
-                ->exists();
+            $table->active_duration = $activeReservation
+                ? $activeReservation->reservation_time->diffInMinutes($now)
+                : null;
 
-            // ESTADO REAL
-            if ($activeOrder) {
+
+            /** -------------------------------
+             * 2. RESERVA FUTURA
+             * -------------------------------- */
+            $futureReservation = $table->futureReservation();
+            $table->futureReservation = $futureReservation;
+
+            $table->future_in_minutes = $futureReservation
+                ? $now->diffInMinutes($futureReservation->reservation_time)
+                : null;
+
+
+            /** -------------------------------
+             * 3. ORDEN ACTIVA
+             * (usa tu función del modelo)
+             * -------------------------------- */
+            $activeOrder = $table->hasActiveOrder($activeReservation);
+
+            /** -------------------------------
+             * 4. ESTADO FINAL DE LA MESA
+             * -------------------------------- */
+            if ($activeReservation || $activeOrder) {
                 $table->status = 'Ocupada';
 
-            } elseif ($activeReservation) {
+            } elseif ($futureReservation) {
                 $table->status = 'Reservada';
 
             } else {
@@ -158,12 +176,19 @@ class TableController extends Controller
     }
 
 
+
+
+
    public function assign($reservationId)
     {
         $reservation = Reservation::findOrFail($reservationId);
 
         // Convertir la hora a Carbon real
         $resTime = \Carbon\Carbon::parse($reservation->reservation_time);
+
+        $waiters = User::where('role', 'mesero')
+               ->where('active', true)
+               ->get();
 
         $tables = Table::where('capacity', '>=', $reservation->people_count)
             ->whereDoesntHave('reservations', function ($query) use ($resTime) {
@@ -177,7 +202,7 @@ class TableController extends Controller
             })
             ->get();
 
-        return view('tables.assign', compact('reservation', 'tables'));
+        return view('tables.assign', compact('reservation', 'tables', 'waiters'));
     }
 
 
@@ -195,6 +220,7 @@ class TableController extends Controller
 
         // Actualizar reserva
         $reservation->table_id = $table->id;
+        $reservation->user_id = $request->user_id;
         $reservation->status = 'confirmada';
         $reservation->save();
 

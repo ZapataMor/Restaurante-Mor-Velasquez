@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\Reservation;
 use App\Models\Table;
 use App\Models\Product;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -38,9 +39,17 @@ class DashboardController extends Controller
             ->get();
 
         $upcomingReservations = Reservation::where('status', 'confirmada')
-            ->where('reservation_time', '>=', now())
+            ->where('reservation_time', '>', now()->endOfDay())  // después de hoy
             ->orderBy('reservation_time', 'asc')
             ->get();
+
+        $todayReservations = Reservation::where('status', 'confirmada')
+            ->whereDate('reservation_time', Carbon::today())
+            ->whereTime('reservation_time', '>=', now()->format('H:i:s'))
+            ->orderBy('reservation_time', 'asc')
+            ->get();
+
+
 
         $pendingReservations = Reservation::where('status', 'pendiente')
             ->orderBy('reservation_time', 'asc')
@@ -100,7 +109,8 @@ class DashboardController extends Controller
                     'stats',
                     'upcomingReservations',
                     'pendingReservations',
-                    'activeOrders'
+                    'activeOrders',
+                    'todayReservations'
                 ));
 
             case 'chef':

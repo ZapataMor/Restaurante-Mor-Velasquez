@@ -13,10 +13,12 @@ class Order extends Model
     protected $fillable = [
         'reservation_id',
         'table_id',
-        'user_id',       // mesero
+        'user_id',
         'status',
         'payment_status',
-        'total_amount',
+        'client_name',
+        'client_document',
+        'total_amount'
     ];
 
     // Orden pertenece a una reserva (opcional)

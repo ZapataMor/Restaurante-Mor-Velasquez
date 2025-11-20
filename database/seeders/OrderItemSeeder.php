@@ -47,7 +47,7 @@ class OrderItemSeeder extends Seeder
                 'quantity'  => 3,
                 'price'     => 5.99,
                 'total'     => 17.97,
-                'status'    => 'servido',
+                'status'    => 'listo',
             ],
 
             // Ítems para la Orden 3 (completada)
@@ -58,7 +58,7 @@ class OrderItemSeeder extends Seeder
                 'quantity'  => 2,
                 'price'     => 10.99,
                 'total'     => 21.98,
-                'status'    => 'servido',
+                'status'    => 'listo',
             ],
             [
                 'order_id'  => 3,
@@ -67,7 +67,7 @@ class OrderItemSeeder extends Seeder
                 'quantity'  => 1,
                 'price'     => 8.99,
                 'total'     => 8.99,
-                'status'    => 'servido',
+                'status'    => 'listo',
             ],
 
             // Ítems para la Orden 4 (cancelada)
@@ -78,7 +78,7 @@ class OrderItemSeeder extends Seeder
                 'quantity'  => 1,
                 'price'     => 13.99,
                 'total'     => 13.99,
-                'status'    => 'cancelado',
+                'status'    => 'preparando',
             ],
         ];
 

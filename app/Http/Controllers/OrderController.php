@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\Reservation;
 use App\Models\Table;
 use App\Models\User;
@@ -17,20 +18,27 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $orders = Order::with(['reservation', 'table', 'user'])->get();
-        return view('orders.index', compact('orders'));
+        return redirect()->route('tables.map');
     }
 
     /**
      * 🟢 Mostrar formulario para crear una nueva orden.
      */
-    public function create()
+    public function create(Request $request)
     {
-        $tables       = Table::all();          // Todas las mesas
-        $reservations = Reservation::all();    // Todas las reservas
-        $meseros      = User::where('role', 'mesero')->get(); // Solo meseros
-        return view('orders.create', compact('tables', 'reservations', 'meseros'));
+        $tables       = Table::all();
+        $reservations = Reservation::all();
+        $meseros      = User::where('role', 'mesero')->get();
+        $productos    = Product::all();
+
+        // Capturamos el table_id si viene en la URL
+        $selectedTableId = $request->query('table_id');
+
+        return view('orders.create', compact(
+            'tables', 'reservations', 'meseros', 'productos', 'selectedTableId'
+        ));
     }
+
 
     /**
      * 🔵 Guardar una nueva orden en la base de datos.
@@ -69,7 +77,7 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        $order->load(['reservation', 'table', 'user', 'order_items.product']);
+        $order->load(['reservation', 'table', 'user', 'orderItems.product']);
         return view('orders.show', compact('order'));
     }
 
@@ -81,7 +89,7 @@ class OrderController extends Controller
         $tables       = Table::all();
         $reservations = Reservation::all();
         $meseros      = User::where('role', 'mesero')->get();
-        $order->load('order_items.product');
+        $order->load('orderItems.product');
 
         return view('orders.edit', compact('order', 'tables', 'reservations', 'meseros'));
     }
@@ -92,11 +100,13 @@ class OrderController extends Controller
     public function update(Request $request, Order $order)
     {
         $request->validate([
-            'reservation_id' => 'nullable|exists:reservations,id',
-            'table_id'       => 'required|exists:tables,id',
-            'user_id'        => 'required|exists:users,id',
-            'status'         => ['required', Rule::in(['abierta','en_proceso','completada','cancelada'])],
-            'payment_status' => ['required', Rule::in(['pendiente','pagado'])],
+            'reservation_id'   => 'nullable|exists:reservations,id',
+            'table_id'         => 'required|exists:tables,id',
+            'user_id'          => 'required|exists:users,id',
+            'status'           => ['required', Rule::in(['abierta','en_proceso','completada','cancelada'])],
+            'payment_status'   => ['required', Rule::in(['pendiente','pagado'])],
+            'client_name'      => 'nullable|string|max:255',
+            'client_document'  => 'nullable|string|max:255',
         ]);
 
         // Validar que el usuario asignado sea mesero
@@ -106,12 +116,37 @@ class OrderController extends Controller
         }
 
         $order->update([
-            'reservation_id' => $request->reservation_id,
-            'table_id'       => $request->table_id,
-            'user_id'        => $request->user_id,
-            'status'         => $request->status,
-            'payment_status' => $request->payment_status,
+            'reservation_id'   => $request->reservation_id,
+            'table_id'         => $request->table_id,
+            'user_id'          => $request->user_id,
+            'status'           => $request->status,
+            'payment_status'   => $request->payment_status,
+            'client_name'      => $request->client_name,
+            'client_document'  => $request->client_document,
         ]);
+
+
+
+        $statusMap = [
+            'Pendiente'       => 'pendiente',
+            'En Preparación'  => 'preparando',
+            'Listo'           => 'listo',
+        ];
+
+        foreach ($request->items as $itemId => $data) {
+            $orderItem = $order->orderItems()->find($itemId);
+            if ($orderItem) {
+                $orderItem->update([
+                    'quantity' => $data['quantity'],
+                    'notes'    => $data['notes'],
+                    'status'   => $statusMap[$data['status']] ?? $orderItem->status,
+                    'total'    => $orderItem->price * $data['quantity'],
+                ]);
+            }
+        }
+
+
+
 
         return redirect()->route('orders.show', $order->id)
                          ->with('success', '✅ Orden actualizada correctamente.');
@@ -126,4 +161,23 @@ class OrderController extends Controller
         return redirect()->route('orders.index')
                          ->with('success', '✅ Orden eliminada correctamente.');
     }
+
+    /**
+     * 🟢 Cerrar una orden (completarla y liberar la mesa)
+     */
+    public function close(Order $order)
+    {
+        if ($order->status === 'completada') {
+            return redirect()->back()->with('info', '⚠️ Esta orden ya está completada.');
+        }
+
+        $order->update([
+            'status' => 'completada',
+            'payment_status' => 'pagado',
+        ]);
+
+        return redirect()->route('tables.map', $order->id)
+                        ->with('success', '✅ La orden ha sido completada y la mesa liberada.');
+    }
+
 }
