@@ -29,15 +29,14 @@ class DashboardController extends Controller
                                             ->sum('total'),
             'reservations_today' => Reservation::whereDate('reservation_time', today())->count(),
             'tables_occupied'    => Table::where('status', 'Ocupada')->count(),
-<<<<<<< HEAD
+
             'total_tables'       => Table::count(),
-=======
+
             'completed_today'    => Order::whereDate('updated_at', today())
                                         ->where('status', 'completada')
                                         ->count(),
             'pending_orders'     => Order::whereIn('status', ['abierta','en_proceso'])
                                         ->count(),
->>>>>>> 74b1dc1794d4de954dcae3e87e87c999bacbd4ad
         ];
 
         // ============================
