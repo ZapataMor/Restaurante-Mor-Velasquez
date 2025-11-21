@@ -17,11 +17,6 @@
             <h3 class="text-2xl font-semibold">Mesas del Restaurante</h3>
 
             <div class="flex gap-3">
-                <a href="{{ route('tables.index') }}"
-                    class="px-4 py-2 rounded-xl bg-neutral-200 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-300 dark:hover:bg-neutral-600 transition shadow-sm">
-                    Ver Lista
-                </a>
-
                 <button onclick="location.reload()"
                     class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition shadow-sm">
                     Actualizar

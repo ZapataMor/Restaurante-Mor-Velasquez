@@ -23,7 +23,7 @@ return new class extends Migration
             $table->dateTime('reservation_time');
 
             // Estado de la reserva
-            $table->enum('status', ['pendiente', 'confirmada', 'cancelada'])
+            $table->enum('status', ['pendiente', 'confirmada', 'cancelada', 'completada'])
                 ->default('pendiente');
 
             // Mesero asignado automáticamente por el sistema

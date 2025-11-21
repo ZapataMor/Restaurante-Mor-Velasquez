@@ -45,13 +45,8 @@ class OrderController extends Controller
                 $reservation = null;
             }
         }
-
-
         return view('orders.create', compact('tables', 'productos', 'selectedTableId', 'reservation'));
     }
-
-
-
 
     /**
      * 🔵 Guardar una nueva orden en la base de datos.
@@ -198,15 +193,12 @@ class OrderController extends Controller
         $items = $request->input('items', []);
 
         foreach ($items as $itemKey => $data) {
-
             // 🔑 Diferenciar entre items nuevos y existentes
             // Si el key empieza con "new_", es un item nuevo
             if (str_starts_with($itemKey, 'new_')) {
-
                 // 🟢 Item nuevo → se crea
                 $product = Product::findOrFail($data['product_id']);
                 $lineTotal = $product->price * ($data['quantity'] ?? 1);
-
                 OrderItem::create([
                     'order_id'   => $order->id,
                     'product_id' => $data['product_id'],
@@ -216,11 +208,8 @@ class OrderController extends Controller
                     'status'     => $data['status'] ?? 'pendiente',
                     'total'      => $lineTotal,
                 ]);
-
                 $totalOrder += $lineTotal;
-
             } else {
-
                 // 🔵 Item existente → se actualiza
                 $orderItem = OrderItem::find($itemKey);
 
@@ -244,7 +233,6 @@ class OrderController extends Controller
 
         // 🔥 Actualizar total provisional de la orden (por compatibilidad)
         $order->update(['total_amount' => $totalOrder]);
-
         // >>> Llamada al método del modelo para recalcular el total definitivo
         // (esto asegurará que items con status = 'cancelado' no se incluyan)
         $order->calculateTotal();
@@ -274,52 +262,79 @@ class OrderController extends Controller
 
         // Asegurar total actualizado antes de cerrar
         $order->calculateTotal();
-
+        
         $order->update([
             'status' => 'completada',
             'payment_status' => 'pagado',
         ]);
 
-        return redirect()->route('tables.map', $order->id)
-                        ->with('success', '✅ La orden ha sido completada y la mesa liberada.');
+        // 🔥 IMPORTANTE: Marcar la reserva como completada
+        if ($order->reservation_id) {
+            $reservation = Reservation::find($order->reservation_id);
+            if ($reservation && $reservation->status === 'confirmada') {
+                $reservation->update(['status' => 'completada']);
+            }
+        }
+        
+        // 🔥 ALTERNATIVA: Si no hay reservation_id pero la mesa tiene una reserva confirmada
+        if (!$order->reservation_id && $order->table_id) {
+            $table = Table::find($order->table_id);
+            if ($table) {
+                $activeReservation = $table->activeReservation();
+                if ($activeReservation) {
+                    $activeReservation->update(['status' => 'completada']);
+                }
+            }
+        }
+
+        return redirect()
+            ->route('tables.map')
+            ->with('success', '✅ La orden ha sido completada y la mesa liberada.');
     }
 
     /**
-     * Actualizar solo el estado (ruta patch)
+     * Actualizar solo el estado de la orden
      */
     public function updateStatus(Request $request, Order $order)
     {
-        $order->load('orderItems'); // cargar los items
+        $order->load('orderItems');
 
         if ($request->input('status') === 'completada') {
-
-            // 🔥 ACEPTAR "listo" Y "cancelado" COMO VALIDOS PARA COMPLETAR LA ORDEN
+            // Verificar que todos los items estén listos o cancelados
             $allReady = $order->orderItems->every(function ($item) {
                 return in_array($item->status, ['listo', 'cancelado']);
             });
 
             if ($allReady) {
                 $order->status = 'completada';
-                $order->payment_status = 'pagado'; // opcional
+                $order->payment_status = 'pagado';
                 $order->save();
 
-                // 🔹 Liberar la mesa asociada
-                if ($order->table()->exists()) {
-                    $table = $order->table()->first();
-                    $table->status = 'Disponible';
-                    $table->save();
+                // 🔥 Marcar la reserva asociada como completada
+                if ($order->reservation_id) {
+                    $reservation = Reservation::find($order->reservation_id);
+                    if ($reservation && $reservation->status === 'confirmada') {
+                        $reservation->update(['status' => 'completada']);
+                    }
+                }
+                
+                // 🔥 ALTERNATIVA: Si no hay reservation_id pero la mesa tiene una reserva confirmada
+                if (!$order->reservation_id && $order->table_id) {
+                    $table = Table::find($order->table_id);
+                    if ($table) {
+                        $activeReservation = $table->activeReservation();
+                        if ($activeReservation) {
+                            $activeReservation->update(['status' => 'completada']);
+                        }
+                    }
                 }
 
-
-
-                return redirect()->back()->with('success', 'Orden marcada como completada y mesa liberada.');
+                return redirect()->back()->with('success', '✅ Orden completada y mesa liberada.');
             }
 
-            return redirect()->back()->with('error', 'No se puede completar la orden: algunos items no están listos.');
+            return redirect()->back()->with('error', '❌ No se puede completar: algunos items no están listos.');
         }
 
         return redirect()->back();
     }
-
-
 }
