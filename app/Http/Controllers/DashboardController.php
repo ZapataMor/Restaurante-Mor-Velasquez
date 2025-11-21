@@ -76,6 +76,11 @@ class DashboardController extends Controller
             ->orderBy('date')
             ->get();
 
+        $cancelledReservations = Reservation::where('status', 'cancelada')
+            ->where('reservation_time', '>=', Carbon::today()) // hoy o futura
+            ->orderBy('reservation_time', 'asc') // las más cercanas primero
+            ->get();
+
         // ============================
         // 📌 Vistas por ROL
         // ============================
@@ -110,7 +115,8 @@ class DashboardController extends Controller
                     'upcomingReservations',
                     'pendingReservations',
                     'activeOrders',
-                    'todayReservations'
+                    'todayReservations',
+                    'cancelledReservations'
                 ));
 
             case 'chef':

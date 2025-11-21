@@ -118,14 +118,14 @@
                             @foreach($activeOrders->take(2) as $order)
                                 <div class="p-3 mb-2 bg-neutral-50 dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 text-center">
                                     <p class="font-medium text-sm">Orden #{{ $order->id }}</p>
-                                    <p class="text-xs text-neutral-600 dark:text-neutral-400">{{ $order->client_name ?? 'Sin mesero' }}</p>
+                                    <p class="text-xs text-neutral-600 dark:text-neutral-400">{{ $order->client_name ?? 'Sin cliente' }}</p>
+                                    <p class="text-xs text-neutral-600 dark:text-neutral-400">Mesero encargado: {{ $order->user->name ?? 'Sin cliente' }}</p>
 
                                     <span class="inline-block mt-2 px-2 py-0.5 text-xs rounded text-white
-                                        @if($order->status === 'abierta') bg-gray-500
-                                        @elseif($order->status === 'en_proceso') bg-yellow-500
-                                        @endif">
+                                        {{ $order->status === 'abierta' ? 'bg-gray-500' : ($order->status === 'en_proceso' ? 'bg-yellow-500' : '') }}">
                                         {{ $order->status }}
                                     </span>
+
 
                                     <p class="text-xs mt-1">{{ $order->orderItems->count() }} items</p>
                                 </div>
@@ -158,7 +158,7 @@
                         @if($canAccess)
                             <a href="{{ route('orders.create') }}?table_id={{ $table->id }}"
                             class="flex-1 text-xs text-center px-3 py-2 rounded-xl bg-green-600 hover:bg-green-700 text-white transition">
-                                Orden
+                                Tomar orden
                             </a>
                         @endif
 

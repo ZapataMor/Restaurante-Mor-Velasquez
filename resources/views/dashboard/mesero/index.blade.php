@@ -66,14 +66,18 @@
                                 </p>
                             </div>
                             <span class="inline-block px-4 py-2 text-sm font-medium rounded-full
-                                @if($order->status === 'En Vista') bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200
-                                @elseif($order->status === 'Confirmada') bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200
-                                @elseif($order->status === 'En Preparación') bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200
-                                @elseif($order->status === 'Lista') bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200
-                                @elseif($order->status === 'Entregada') bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200
-                                @endif">
+                                {{ 
+                                    $order->status === 'abierta' ? 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200' :
+                                    ($order->status === 'en_proceso' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200' :
+                                    ($order->status === 'completada' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200' :
+                                    ($order->status === 'cancelada' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200' :
+                                    'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200'))) 
+                                }}
+                            ">
                                 {{ $order->status }}
                             </span>
+
+
                         </div>
 
                         <!-- Items de la orden -->
@@ -88,12 +92,17 @@
                                         @endif
                                     </div>
                                     <span class="px-2 py-1 text-xs rounded-full
-                                        @if($item->status === 'Pendiente') bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300
-                                        @elseif($item->status === 'En Preparación') bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300
-                                        @elseif($item->status === 'Listo') bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300
-                                        @endif">
+                                        {{
+                                            $item->status === 'pendiente' ? 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300' :
+                                            ($item->status === 'preparando' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' :
+                                            ($item->status === 'listo' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
+                                            'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300'))
+                                        }}
+                                    ">
                                         {{ $item->status }}
                                     </span>
+
+
                                 </div>
                             @endforeach
                         </div>
@@ -143,11 +152,11 @@
 
                             <!-- Estado REAL -->
                             <span class="text-xs px-2 py-1 rounded-full
-                                @if($order->status === 'abierta') bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300
-                                @elseif($order->status === 'en_proceso') bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300
-                                @elseif($order->status === 'completada') bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300
-                                @elseif($order->status === 'cancelada') bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300
-                                @endif">
+                                {{ $order->status === 'abierta' ? 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300' :
+                                ($order->status === 'en_proceso' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
+                                ($order->status === 'completada' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
+                                ($order->status === 'cancelada' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' :
+                                'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300'))) }}">
                                 {{ ucfirst(str_replace('_', ' ', $order->status)) }}
                             </span>
                         </div>

@@ -43,7 +43,7 @@
                         </div>
                         <div>
                             <label class="block text-amber-400 mb-1">Identificación</label>
-                            <input type="text" name="cliente_document" required
+                            <input type="text" name="client_document" required
                                 class="w-full p-2 rounded-lg bg-black/30 border border-white/20 text-white focus:ring-2 focus:ring-amber-400 outline-none">
                         </div>
                     </div>

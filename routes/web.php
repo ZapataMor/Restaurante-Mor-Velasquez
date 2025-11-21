@@ -29,6 +29,7 @@ Route::get('/contacto', [PublicController::class, 'contacto'])->name('contacto')
 Route::prefix('reservas')->group(function () {
     Route::get('/', [ReservationController::class, 'index'])->name('reservas.index');
     Route::post('/', [ReservationController::class, 'store'])->name('reservas.store');
+    Route::delete('/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('reservas.cancel');
 });
 
 Route::prefix('consultar-reserva')->group(function () {

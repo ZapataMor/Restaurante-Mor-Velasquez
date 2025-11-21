@@ -14,7 +14,7 @@ return new class extends Migration
             // Datos ingresados por cualquier cliente desde la web
             $table->string('client_name');
             $table->string('client_contact');
-            $table->string('cliente_document');
+            $table->string('client_document');
 
             // Para saber cuántas personas vienen
             $table->unsignedInteger('people_count');

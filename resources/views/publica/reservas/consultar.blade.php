@@ -59,7 +59,7 @@
             <div class="mt-12 bg-black/30 backdrop-blur-md p-8 rounded-2xl border border-white/10 text-left">
                 <h3 class="text-amber-400 text-2xl font-semibold mb-4">Detalles de tu reserva</h3>
                 <p><span class="font-semibold">Nombre:</span> {{ $reserva->client_name }}</p>
-                <p><span class="font-semibold">Documento:</span> {{ $reserva->cliente_document }}</p>
+                <p><span class="font-semibold">Documento:</span> {{ $reserva->client_document }}</p>
                 <p><span class="font-semibold">Contacto:</span> {{ $reserva->client_contact }}</p>
                 <p><span class="font-semibold">Fecha y hora:</span> {{ \Carbon\Carbon::parse($reserva->reservation_time)->format('d/m/Y H:i') }}</p>
                 <p><span class="font-semibold">Asistentes:</span> {{ $reserva->people_count }} personas</p>

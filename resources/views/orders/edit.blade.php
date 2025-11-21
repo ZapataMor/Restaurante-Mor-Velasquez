@@ -1,5 +1,12 @@
 <x-layouts.app :title="__('Editar Orden')">
 
+    <!-- Script de productos ANTES de todo -->
+    <script>
+        // 🔥 Cargar productos ANTES de que se cargue orders.js
+        window.productsList = {!! json_encode($productos) !!};
+        console.log('✅ Productos precargados:', window.productsList ? window.productsList.length : 0);
+    </script>
+
     <!-- HERO superior -->
     <section class="relative w-full rounded-2xl overflow-hidden shadow-lg mb-6">
         <img src="{{ asset('images/Restaurante.jpg') }}"
@@ -24,14 +31,12 @@
             <input type="hidden" name="user_id" value="{{ $order->user_id }}">
             <input type="hidden" name="payment_status" value="{{ $order->payment_status }}">
 
-
             <div class="grid gap-4 md:grid-cols-3">
                 <div>
                     <label class="text-sm text-neutral-500">Estado</label>
                     <select name="status" class="mt-1 w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm p-2">
                         <option value="abierta" {{ $order->status === 'abierta' ? 'selected' : '' }}>Abierta</option>
                         <option value="en_proceso" {{ $order->status === 'en_proceso' ? 'selected' : '' }}>En Proceso</option>
-                        <option value="completada" {{ $order->status === 'completada' ? 'selected' : '' }}>Completada</option>
                         <option value="cancelada" {{ $order->status === 'cancelada' ? 'selected' : '' }}>Cancelada</option>
                     </select>
                 </div>
@@ -53,40 +58,59 @@
         <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-700 p-6 shadow-sm">
             <h3 class="text-xl font-semibold mb-4">Items de la Orden</h3>
 
-            @foreach($order->orderItems as $index => $item)
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between p-4 mb-2 bg-neutral-50 dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 gap-2">
-                    
-                    <!-- Producto -->
-                    <div class="flex-1">
-                        <p class="font-medium text-sm">{{ $item->product->name }}</p>
-                    </div>
+            <div id="products-container" class="space-y-4">
 
-                    <!-- Cantidad -->
-                    <div class="w-20">
-                        <label class="text-xs text-neutral-500">Cantidad</label>
-                        <input type="number" name="items[{{ $item->id }}][quantity]" value="{{ $item->quantity }}" min="1" 
-                               class="mt-1 w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 p-1 text-sm" />
-                    </div>
+                <!-- Items existentes -->
+                @foreach($order->orderItems as $item)
+                    <div class="product-item border border-neutral-200 dark:border-neutral-700 rounded-xl p-4">
+                        <div class="grid md:grid-cols-12 gap-4">
 
-                    <!-- Notas -->
-                    <div class="flex-1">
-                        <label class="text-xs text-neutral-500">Notas</label>
-                        <input type="text" name="items[{{ $item->id }}][notes]" value="{{ $item->notes }}" 
-                               class="mt-1 w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 p-1 text-sm" />
-                    </div>
+                            <!-- Producto (solo lectura) -->
+                            <div class="md:col-span-4">
+                                <label class="text-sm text-neutral-500">Producto</label>
+                                <input type="text" readonly value="{{ $item->product->name }}"
+                                    class="mt-1 w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800 px-4 py-2 text-sm">
+                                
+                                <!-- Item existente usa su ID real como clave -->
+                                <input type="hidden" name="items[{{ $item->id }}][product_id]" value="{{ $item->product_id }}">
+                            </div>
 
-                    <!-- Estado -->
-                    <div class="w-32">
-                        <label class="text-xs text-neutral-500">Estado</label>
-                        <select name="items[{{ $item->id }}][status]" 
-                                class="mt-1 w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm p-1">
-                            <option value="Pendiente" {{ $item->status === 'pendiente' ? 'selected' : '' }}>Pendiente</option>
-                            <option value="En Preparación" {{ $item->status === 'preparando' ? 'selected' : '' }}>En Preparación</option>
-                            <option value="Listo" {{ $item->status === 'Listo' ? 'selected' : '' }}>Listo</option>
-                        </select>
+                            <!-- Cantidad -->
+                            <div class="md:col-span-2">
+                                <label class="text-sm text-neutral-500">Cantidad</label>
+                                <input type="number" name="items[{{ $item->id }}][quantity]" value="{{ $item->quantity }}" min="1"
+                                    class="mt-1 w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-2 py-1 text-sm">
+                            </div>
+
+                            <!-- Notas -->
+                            <div class="md:col-span-3">
+                                <label class="text-sm text-neutral-500">Notas</label>
+                                <input type="text" name="items[{{ $item->id }}][notes]" value="{{ $item->notes }}"
+                                    class="mt-1 w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-2 py-1 text-sm">
+                            </div>
+
+                            <!-- Estado -->
+                            <div class="md:col-span-2">
+                                <label class="text-sm text-neutral-500">Estado</label>
+                                <select name="items[{{ $item->id }}][status]"
+                                    class="mt-1 w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-2 py-1 text-sm">
+                                    <option value="pendiente"   {{ $item->status === 'pendiente' ? 'selected' : '' }}>Pendiente</option>
+                                    <option value="preparando"  {{ $item->status === 'preparando' ? 'selected' : '' }}>En Preparación</option>
+                                    <option value="listo"       {{ $item->status === 'listo' ? 'selected' : '' }}>Listo</option>
+                                </select>
+                            </div>
+
+                        </div>
                     </div>
-                </div>
-            @endforeach
+                @endforeach
+
+            </div>
+
+            <!-- Botón agregar producto -->
+            <button type="button" id="addProductBtn" 
+                class="mt-4 bg-blue-500 hover:bg-blue-600 text-white rounded-xl px-4 py-2 text-sm">
+                + Agregar Producto
+            </button>
         </div>
 
         <!-- Acciones -->
@@ -103,5 +127,98 @@
         </div>
 
     </form>
+
+    <script>
+    // Lista de productos disponibles
+    const productsList = {!! json_encode($productos) !!};
+    
+    // Validar que productsList exista
+    if (!productsList || productsList.length === 0) {
+        console.error('No hay productos disponibles');
+    } else {
+        console.log('Productos cargados:', productsList.length);
+    }
+    
+    // Contador para nuevos items
+    let newItemCounter = 0;
+
+    // Event listener para el botón
+    document.addEventListener('DOMContentLoaded', function() {
+        const addBtn = document.getElementById('addProductBtn');
+        if (addBtn) {
+            addBtn.addEventListener('click', addProduct);
+        }
+    });
+
+    function addProduct() {
+        // Validar que haya productos
+        if (!productsList || productsList.length === 0) {
+            alert('No hay productos disponibles');
+            return;
+        }
+
+        // Crear clave única con prefijo "new_"
+        const itemKey = 'new_' + newItemCounter;
+        newItemCounter++;
+
+        console.log('Agregando producto con clave:', itemKey); // Debug
+
+        const container = document.getElementById('products-container');
+
+        const div = document.createElement('div');
+        div.classList.add('product-item', 'border', 'border-neutral-200', 'dark:border-neutral-700', 'rounded-xl', 'p-4');
+        
+        // Construir el HTML con template literals
+        let productOptions = '<option value="">Seleccione un producto</option>';
+        productsList.forEach(function(p) {
+            productOptions += `<option value="${p.id}">${p.name} - ${p.price}</option>`;
+        });
+
+        div.innerHTML = `
+            <div class="grid md:grid-cols-12 gap-4">
+
+                <div class="md:col-span-4">
+                    <label class="text-sm text-neutral-500">Producto</label>
+                    <select name="items[${itemKey}][product_id]" required 
+                        class="mt-1 w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-4 py-2 text-sm">
+                        ${productOptions}
+                    </select>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="text-sm text-neutral-500">Cantidad</label>
+                    <input type="number" name="items[${itemKey}][quantity]" value="1" min="1" required
+                        class="mt-1 w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-2 py-1 text-sm">
+                </div>
+
+                <div class="md:col-span-3">
+                    <label class="text-sm text-neutral-500">Notas</label>
+                    <input type="text" name="items[${itemKey}][notes]" placeholder="Ej: Sin cebolla"
+                        class="mt-1 w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-2 py-1 text-sm">
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="text-sm text-neutral-500">Estado</label>
+                    <select name="items[${itemKey}][status]"
+                        class="mt-1 w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-2 py-1 text-sm">
+                        <option value="pendiente" selected>Pendiente</option>
+                        <option value="preparando">En Preparación</option>
+                        <option value="listo">Listo</option>
+                    </select>
+                </div>
+
+                <div class="md:col-span-1">
+                    <button type="button" onclick="this.closest('.product-item').remove()"
+                        class="remove-product-btn mt-6 w-full bg-red-500 hover:bg-red-600 text-white rounded-xl px-3 py-2 text-sm">
+                        Eliminar
+                    </button>
+                </div>
+
+            </div>
+        `;
+
+        container.appendChild(div);
+    }
+    </script>
 
 </x-layouts.app>

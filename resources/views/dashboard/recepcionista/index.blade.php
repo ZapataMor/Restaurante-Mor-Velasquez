@@ -34,19 +34,7 @@
         </div>
 
         <!-- 🎯 Acciones rápidas -->
-        <div class="grid gap-6 md:grid-cols-2">
-
-            <a href="{{ route('reservations.create') }}"
-               class="flex items-center gap-4 p-6 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-2xl shadow-sm hover:shadow-md hover:border-amber-500 transition">
-                <div class="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center">
-                    ➕
-                </div>
-                <div>
-                    <p class="font-semibold">Nueva Reserva</p>
-                    <p class="text-sm text-neutral-600 dark:text-neutral-400">Registrar una nueva reserva</p>
-                </div>
-            </a>
-
+        <div class="grid gap-6 md:grid">
             <a href="{{ route('tables.map') }}"
                class="flex items-center gap-4 p-6 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-2xl shadow-sm hover:shadow-md hover:border-green-500 transition">
                 <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
@@ -57,7 +45,6 @@
                     <p class="text-sm text-neutral-600 dark:text-neutral-400">Disponibilidad en tiempo real</p>
                 </div>
             </a>
-
         </div>
 
         <!-- 🕒 Reservas Pendientes -->
@@ -73,6 +60,7 @@
 
                 @forelse ($pendingReservations as $reservation)
                     <div class="flex items-center justify-between p-4 bg-neutral-50 dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition">
+                        
                         <div>
                             <p class="font-semibold">{{ $reservation->client_name }}</p>
                             <p class="text-sm text-neutral-600 dark:text-neutral-400">
@@ -82,10 +70,24 @@
                                 {{ \Carbon\Carbon::parse($reservation->reservation_time)->format('d M - H:i') }}
                             </p>
                         </div>
-                        <a href="{{ route('tables.assign', $reservation->id) }}"
-                           class="px-4 py-2 bg-amber-500 text-white rounded-xl hover:bg-amber-600 transition">
-                            Asignar Mesa
-                        </a>
+
+                        <!-- Botones responsivos: columna en móvil, fila en sm+ -->
+                        <div class="flex flex-col sm:flex-row justify-center gap-2">
+                            <a href="{{ route('tables.assign', $reservation->id) }}"
+                            class="w-28 px-2 py-1 bg-amber-500 text-white rounded-xl hover:bg-amber-600 transition text-xs text-center">
+                                Asignar Mesa
+                            </a>
+
+                            <form action="{{ route('reservas.cancel', $reservation->id) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" 
+                                        class="w-28 px-2 py-1 bg-red-500 cursor-pointer text-white rounded-xl hover:bg-red-600 transition text-xs text-center">
+                                    Cancelar Reserva
+                                </button>
+                            </form>
+                        </div>
+
                     </div>
                 @empty
                     <p class="text-center text-neutral-400 py-6">No hay reservas pendientes</p>
@@ -93,6 +95,8 @@
 
             </div>
         </div>
+
+
 
         <!-- 📅 Reservas de hoy -->
         <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-700 p-6 shadow-sm">
@@ -171,6 +175,29 @@
 
             </div>
         </div>
+
+        <!-- ❌ Reservas Canceladas -->
+        <div class="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-700 p-6 shadow-sm mt-6">
+            <h3 class="text-xl font-semibold mb-6">Reservas Canceladas</h3>
+
+            <div class="space-y-4 max-h-80 overflow-y-auto pr-2">
+                @forelse ($cancelledReservations as $reservation)
+                    <div class="flex items-center justify-between p-4 bg-red-50 dark:bg-red-900/40 rounded-xl border border-red-200 dark:border-red-700 transition">
+                        <div>
+                            <p class="font-medium">{{ $reservation->client_name }}</p>
+                            <p class="text-sm text-neutral-600 dark:text-neutral-400">{{ $reservation->people_count }} personas</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-semibold">{{ \Carbon\Carbon::parse($reservation->reservation_time)->format('d M') }}</p>
+                            <p class="text-xs text-neutral-500">{{ \Carbon\Carbon::parse($reservation->reservation_time)->format('H:i') }}</p>
+                        </div>
+                    </div>
+                @empty
+                    <p class="text-center text-neutral-400 py-6">No hay reservas canceladas</p>
+                @endforelse
+            </div>
+        </div>
+
     </div>
 
 </x-layouts.app>

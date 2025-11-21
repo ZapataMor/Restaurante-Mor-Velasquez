@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-use app\Models\Table;
+use App\Models\Table;
 
 class Reservation extends Model
 {
@@ -14,7 +14,7 @@ class Reservation extends Model
     protected $fillable = [
         'client_name',
         'client_contact',
-        'cliente_document',
+        'client_document',
         'people_count',
         'reservation_time',
         'status',

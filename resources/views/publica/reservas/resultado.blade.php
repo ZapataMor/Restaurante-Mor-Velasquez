@@ -34,25 +34,25 @@
 
                         <div class="space-y-2 text-gray-200">
                             <p><span class="font-semibold text-amber-300">Nombre:</span> {{ $reserva->client_name }}</p>
-                            <p><span class="font-semibold text-amber-300">Documento:</span> {{ $reserva->cliente_document }}</p>
+                            <p><span class="font-semibold text-amber-300">Documento:</span> {{ $reserva->client_document }}</p>
                             <p><span class="font-semibold text-amber-300">Contacto:</span> {{ $reserva->client_contact }}</p>
                             <p><span class="font-semibold text-amber-300">Fecha y hora:</span> {{ \Carbon\Carbon::parse($reserva->reservation_time)->format('d/m/Y H:i') }}</p>
                             <p><span class="font-semibold text-amber-300">Asistentes:</span> {{ $reserva->people_count }} personas</p>
-                            <p><span class="font-semibold text-amber-300">Mesa:</span> {{ $reserva->table->name ?? 'No especificada' }}</p>
+                            <p><span class="font-semibold text-amber-300">Numero de la mesa asignada:</span> {{ $reserva->table->number ?? 'No especificada' }}</p>
                             <p><span class="font-semibold text-amber-300">Mesero asignado:</span> {{ $reserva->user->name ?? 'No asignado' }}</p>
 
-                            {{-- <!-- Estado -->
+                            <!-- Estado -->
                             <p class="mt-3">
                                 <span class="font-semibold text-amber-300">Estado:</span>
                                 <span class="px-3 py-1 rounded-full text-sm font-medium
-                                    @if($reserva->status === 'confirmada') bg-green-500/20 text-green-300
-                                    @elseif($reserva->status === 'pendiente') bg-yellow-500/20 text-yellow-300
-                                    @elseif($reserva->status === 'cancelada') bg-red-500/20 text-red-300
-                                    @else bg-gray-500/20 text-gray-300 @endif">
+                                    {{ $reserva->status === 'confirmada' ? 'bg-green-500/20 text-green-300' :
+                                    ($reserva->status === 'pendiente' ? 'bg-yellow-500/20 text-yellow-300' :
+                                    ($reserva->status === 'cancelada' ? 'bg-red-500/20 text-red-300' :
+                                    'bg-gray-500/20 text-gray-300')) }}">
                                     {{ ucfirst($reserva->status) }}
                                 </span>
                             </p>
-                        </div> --}}
+                        </div>
                     </div>
                 @endforeach
             </div>

@@ -14,7 +14,7 @@ class ReservationSeeder extends Seeder
             [
                 'client_name'      => 'Juan Pérez',
                 'client_contact'   => '3001234567',
-                'cliente_document' => '1095823412',
+                'client_document' => '1095823412',
                 'people_count'     => 4,
                 'reservation_time' => Carbon::now()->addDay()->setTime(19, 30),
                 'status'           => 'pendiente',
@@ -24,7 +24,7 @@ class ReservationSeeder extends Seeder
             [
                 'client_name'      => 'María Gómez',
                 'client_contact'   => '3019876543',
-                'cliente_document' => '1029384756',
+                'client_document' => '1029384756',
                 'people_count'     => 2,
                 'reservation_time' => Carbon::now()->addDays(2)->setTime(18, 00),
                 'status'           => 'confirmada',
@@ -34,7 +34,7 @@ class ReservationSeeder extends Seeder
             [
                 'client_name'      => 'Carlos Ramírez',
                 'client_contact'   => '3025558899',
-                'cliente_document' => '1005839201',
+                'client_document' => '1005839201',
                 'people_count'     => 6,
                 'reservation_time' => Carbon::now()->addHours(5),
                 'status'           => 'pendiente',
@@ -44,7 +44,7 @@ class ReservationSeeder extends Seeder
             [
                 'client_name'      => 'Carlos Luquez',
                 'client_contact'   => '3025558889',
-                'cliente_document' => '1005839291',
+                'client_document' => '1005839291',
                 'people_count'     => 6,
                 'reservation_time' => Carbon::now()->addHours(5),
                 'status'           => 'pendiente',
@@ -54,7 +54,7 @@ class ReservationSeeder extends Seeder
             [
                 'client_name'      => 'Miguel Ramírez',
                 'client_contact'   => '3025558879',
-                'cliente_document' => '1005839271',
+                'client_document' => '1005839271',
                 'people_count'     => 2,
                 'reservation_time' => Carbon::now()->addHours(5),
                 'status'           => 'pendiente',
@@ -64,7 +64,7 @@ class ReservationSeeder extends Seeder
             [
                 'client_name'      => 'Laura Martínez',
                 'client_contact'   => '3124447788',
-                'cliente_document' => '1122334455',
+                'client_document' => '1122334455',
                 'people_count'     => 3,
                 'reservation_time' => Carbon::now()->subDay()->setTime(20, 15),
                 'status'           => 'cancelada',
@@ -74,7 +74,7 @@ class ReservationSeeder extends Seeder
             [
                 'client_name'      => 'Pedro Torres',
                 'client_contact'   => '3157776699',
-                'cliente_document' => '1199223344',
+                'client_document' => '1199223344',
                 'people_count'     => 5,
                 'reservation_time' => Carbon::now()->addDays(3)->setTime(21, 00),
                 'status'           => 'confirmada',
@@ -84,7 +84,7 @@ class ReservationSeeder extends Seeder
             [
                 'client_name'      => 'Pedro Torres',
                 'client_contact'   => '3157776699',
-                'cliente_document' => '1199223344',
+                'client_document' => '1199223344',
                 'people_count'     => 5,
 
                 // Reserva para "ahora" + 30 minutos

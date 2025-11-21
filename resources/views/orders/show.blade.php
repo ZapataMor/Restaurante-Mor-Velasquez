@@ -22,13 +22,14 @@
                 <div>
                     <p class="text-sm text-neutral-500">Estado</p>
                     <span class="inline-block mt-1 px-3 py-1 text-xs rounded-full text-white
-                        @if($order->status === 'abierta') bg-gray-500
-                        @elseif($order->status === 'en_proceso') bg-blue-500
-                        @elseif($order->status === 'completada') bg-green-500
-                        @elseif($order->status === 'cancelada') bg-red-500
-                        @endif">
+                        {{ $order->status === 'abierta' ? 'bg-gray-500' :
+                        ($order->status === 'en_proceso' ? 'bg-blue-500' :
+                        ($order->status === 'completada' ? 'bg-green-500' :
+                        ($order->status === 'cancelada' ? 'bg-red-500' :
+                        'bg-gray-300'))) }}">
                         {{ ucfirst(str_replace('_',' ',$order->status)) }}
                     </span>
+
                 </div>
 
                 <div>
@@ -61,12 +62,13 @@
                     </div>
 
                     <span class="px-2 py-1 text-xs rounded-full text-white
-                        @if($item->status === 'Pendiente') bg-gray-500
-                        @elseif($item->status === 'En Preparación') bg-yellow-500
-                        @elseif($item->status === 'Listo') bg-green-500
-                        @endif">
+                        {{ $item->status === 'pendiente' ? 'bg-gray-500' :
+                        ($item->status === 'preparando' ? 'bg-yellow-500' :
+                        ($item->status === 'listo' ? 'bg-green-900' :
+                        'bg-gray-300')) }}">
                         {{ $item->status }}
                     </span>
+
                 </div>
             @empty
                 <p class="text-neutral-500 text-center py-6">No hay items en esta orden</p>
@@ -75,30 +77,40 @@
 
         <!-- Acciones -->
         <div class="flex flex-wrap gap-3">
-            @if($order->status !== 'completada')
-                <a href="{{ route('orders.edit', $order->id) }}"
-                   class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-center text-sm transition">
-                   Editar Orden
-                </a>
+            @if(auth()->user()->role === 'mesero')
+                @if($order->status !== 'completada')
+                    <!-- Botón Editar -->
+                    <a href="{{ route('orders.edit', $order->id) }}"
+                    class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-center text-sm transition">
+                    Editar Orden
+                    </a>
+
+                    <!-- Botón Marcar como Completada solo si todos los items están listos -->
+                    @php
+                        $allReady = $order->orderItems->every(fn($item) => $item->status === 'listo')
+                    @endphp
+
+                    <form action="{{ route('orders.updateStatus', $order->id) }}" method="POST" class="flex-1">
+                        @csrf
+                        @method('PATCH')
+                        <input type="hidden" name="status" value="completada">
+                        <button type="submit"
+                                class="w-full px-4 py-2 rounded-xl text-sm transition
+                                    {{ $allReady ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-green-300 text-white cursor-not-allowed' }}"
+                                {{ $allReady ? '' : 'disabled' }}>
+                            Marcar como Completada
+                        </button>
+                    </form>
+                @endif
             @endif
 
-            @if($order->status !== 'completada')
-                <form action="{{ route('orders.updateStatus', $order->id) }}" method="POST" class="flex-1">
-                    @csrf
-                    @method('PATCH')
-                    <input type="hidden" name="status" value="completada">
-                    <button type="submit"
-                        class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm transition">
-                        Marcar como Completada
-                    </button>
-                </form>
-            @endif
-
+            <!-- Botón siempre visible -->
             <a href="{{ route('tables.map') }}"
-               class="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-xl text-center text-sm transition">
-               Volver a Mesas
+            class="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-xl text-center text-sm transition">
+            Volver a Mesas
             </a>
         </div>
+
 
     </div>
 

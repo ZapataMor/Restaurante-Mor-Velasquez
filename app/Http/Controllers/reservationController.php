@@ -26,7 +26,7 @@ class ReservationController extends Controller
         $request->validate([
             'client_name'      => 'required|string|max:255',
             'client_contact'   => 'required|string|max:20',
-            'cliente_document' => 'required|string|max:20',
+            'client_document' => 'required|string|max:20',
             'reservation_date' => 'required|date',
             'reservation_time' => 'required',
             'people_count'     => 'required|integer|min:1',
@@ -39,26 +39,17 @@ class ReservationController extends Controller
             $request->reservation_date . ' ' . $request->reservation_time
         );
 
-        // Asignar mesero automáticamente
-        $mesero = Auth::user() ?? User::where('role', 'mesero')->inRandomOrder()->first();
-
-        if (!$mesero) {
-            return redirect()->back()->with('error', '❌ No hay meseros disponibles para asignar.');
-        }
-
         // Crear la reserva SIN MESA por ahora
         Reservation::create([
             'client_name'      => $request->client_name,
             'client_contact'   => $request->client_contact,
-            'cliente_document' => $request->cliente_document,
+            'client_document' => $request->client_document,
             'reservation_time' => $reservationDateTime,
             'people_count'     => $request->people_count,
             'notes'            => $request->notes,
             
-            // 🔹 Asignación automática de mesero
-            'user_id'          => $mesero->id,
-
-            // ❗ La mesa queda pendiente para que el recepcionista la asigne
+            //❗ La mesa y el msero quedan pendientes para que el recepcionista la asigne
+            'user_id'          => null,
             'table_id'         => null,
         ]);
 
@@ -87,7 +78,7 @@ class ReservationController extends Controller
         $reservas = Reservation::with('user')
             ->where('client_name', 'like', "%{$query}%")
             ->orWhere('client_contact', 'like', "%{$query}%")
-            ->orWhere('cliente_document', 'like', "%{$query}%")
+            ->orWhere('client_document', 'like', "%{$query}%")
             ->get();
 
         if ($reservas->isEmpty()) {
@@ -96,4 +87,16 @@ class ReservationController extends Controller
 
         return view('publica.reservas.resultado', compact('reservas', 'query'));
     }
+
+    public function cancel(Reservation $reservation)
+    {
+        // Si quieres eliminarla:
+        // $reservation->delete();
+
+        // O cambiar su estado a 'cancelada':
+        $reservation->update(['status' => 'cancelada']);
+
+        return redirect()->back()->with('success', 'Reserva cancelada correctamente.');
+    }
+
 }
