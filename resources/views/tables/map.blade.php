@@ -145,17 +145,30 @@
                             $canAccess = false;
                             $canRelease = false;
                             $activeOrder = $table->activeOrder();
+                            $activeReservation = $table->activeReservation;
 
                             if ($user->role === 'mesero') {
 
-                                // 🟢 Mesas disponibles → el mesero puede crear una orden
+                                // 🟢 Mesa DISPONIBLE (sin reserva, sin orden) → cualquier mesero puede tomar
                                 if ($status === 'Disponible') {
                                     $canAccess = true;
                                 }
 
-                                // 🟡 Mesa ocupada SIN orden → permitir tomar orden
-                                if ($status === 'Ocupada' && !$activeOrder) {
-                                    $canAccess = true;
+                                // 🔴 Mesa OCUPADA (con reserva activa pero sin orden)
+                                // Solo el mesero asignado a la reserva puede tomar la orden
+                                if ($status === 'Ocupada' && !$activeOrder && $activeReservation) {
+                                    if ($activeReservation->user_id === $user->id) {
+                                        $canAccess = true;
+                                    }
+                                }
+
+                                // 🟡 Mesa RESERVADA (reserva próxima ≤30 min)
+                                // Solo el mesero asignado puede prepararse
+                                if ($status === 'Reservada' && $table->futureReservation) {
+                                    if ($table->futureReservation->user_id === $user->id) {
+                                        // Opcionalmente permitir acceso anticipado
+                                        // $canAccess = true;
+                                    }
                                 }
 
                                 // 🔴 Solo el mesero dueño de la orden puede liberar la mesa
@@ -172,6 +185,13 @@
                             class="flex-1 text-xs text-center px-3 py-2 rounded-xl bg-green-600 hover:bg-green-700 text-white transition">
                                 Tomar orden
                             </a>
+                        @endif
+
+                        {{-- ⚠️ Mostrar mensaje si es mesero pero no está asignado --}}
+                        @if($user->role === 'mesero' && !$canAccess && !$activeOrder && $status === 'Ocupada' && $activeReservation)
+                            <div class="flex-1 text-xs text-center px-3 py-2 rounded-xl bg-gray-400 text-white cursor-not-allowed">
+                                Mesero: {{ $activeReservation->user->name ?? 'Asignado' }}
+                            </div>
                         @endif
 
                         {{-- 🔵 Ver detalles de la orden --}}
