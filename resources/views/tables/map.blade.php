@@ -18,7 +18,7 @@
 
             <div class="flex gap-3">
                 <button onclick="location.reload()"
-                    class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition shadow-sm">
+                    class="px-4 py-2 cursor-pointer rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition shadow-sm">
                     Actualizar
                 </button>
             </div>

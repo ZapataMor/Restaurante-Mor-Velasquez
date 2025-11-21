@@ -61,14 +61,31 @@
             <h3 class="text-xl font-semibold mb-4">Items de la Orden</h3>
 
             @forelse($order->orderItems as $item)
+                @php
+                    $subtotal = $item->quantity * $item->price;
+                @endphp
                 <div class="flex items-center justify-between p-4 mb-2 bg-neutral-50 dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700">
+                    
+                    <!-- Información del item -->
                     <div class="flex flex-col">
-                        <p class="font-medium">{{ $item->quantity }}x {{ $item->product->name }}</p>
+                        <p class="font-medium">
+                            {{ $item->quantity }}x {{ $item->product->name }}
+                        </p>
+
+                        <p class="text-xs text-neutral-500 mt-1">
+                            Precio unitario: ${{ number_format($item->price, 0, ',', '.') }}
+                        </p>
+
+                        <p class="text-xs text-neutral-500 mt-1">
+                            Subtotal: ${{ number_format($subtotal, 0, ',', '.') }}
+                        </p>
+
                         @if($item->notes)
-                            <p class="text-xs text-neutral-500 mt-1">Notas: {{ $item->notes }}</p>
+                            <p class="text-xs text-neutral-400 mt-1">Notas: {{ $item->notes }}</p>
                         @endif
                     </div>
 
+                    <!-- Estado -->
                     <span class="px-2 py-1 text-xs rounded-full text-white
                         {{
                             $item->status === 'pendiente' ? 'bg-gray-500' :
@@ -80,51 +97,54 @@
                         {{ $item->status }}
                     </span>
 
-
                 </div>
             @empty
                 <p class="text-neutral-500 text-center py-6">No hay items en esta orden</p>
             @endforelse
+
         </div>
+
 
         <!-- Acciones -->
         <div class="flex flex-wrap gap-3">
-            @if(auth()->user()->role === 'mesero')
+            @if(auth()->user()->role === 'mesero' || auth()->user()->role === 'chef')
                 @if($order->status !== 'completada')
-                    <!-- Botón Editar -->
+                    <!-- Botón Editar (accesible a mesero y chef) -->
                     <a href="{{ route('orders.edit', $order->id) }}"
                     class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-center text-sm transition">
-                    Editar Orden
+                        Editar Orden
                     </a>
-
-                    <!-- Botón Marcar como Completada solo si todos los items están listos -->
-                    @php
-                        $allReady = $order->orderItems->every(fn($item) =>
-                            in_array($item->status, ['listo', 'cancelado'])
-                        );
-                    @endphp
-
-
-                    <form action="{{ route('orders.updateStatus', $order->id) }}" method="POST" class="flex-1">
-                        @csrf
-                        @method('PATCH')
-                        <input type="hidden" name="status" value="completada">
-                        <button type="submit"
-                                class="w-full px-4 py-2 rounded-xl text-sm transition
-                                    {{ $allReady ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-green-300 text-white cursor-not-allowed' }}"
-                                {{ $allReady ? '' : 'disabled' }}>
-                            Marcar como Completada
-                        </button>
-                    </form>
                 @endif
+            @endif
+
+            <!-- Botón Marcar como Completada (solo mesero) -->
+            @if(auth()->user()->role === 'mesero' && $order->status !== 'completada')
+                @php
+                    $allReady = $order->orderItems->every(fn($item) =>
+                        in_array($item->status, ['listo', 'cancelado'])
+                    );
+                @endphp
+
+                <form action="{{ route('orders.updateStatus', $order->id) }}" method="POST" class="flex-1">
+                    @csrf
+                    @method('PATCH')
+                    <input type="hidden" name="status" value="completada">
+                    <button type="submit"
+                            class="w-full px-4 py-2 rounded-xl text-sm transition
+                                {{ $allReady ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-green-300 text-white cursor-not-allowed' }}"
+                            {{ $allReady ? '' : 'disabled' }}>
+                        Marcar como Completada
+                    </button>
+                </form>
             @endif
 
             <!-- Botón siempre visible -->
             <a href="{{ route('tables.map') }}"
             class="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-xl text-center text-sm transition">
-            Volver a Mesas
+                Volver a Mesas
             </a>
         </div>
+
 
 
     </div>
