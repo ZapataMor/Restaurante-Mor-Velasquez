@@ -34,13 +34,24 @@ class OrderController extends Controller
         $reservation = null;
 
         if ($selectedTableId) {
+            // Buscar reserva confirmada para hoy
             $reservation = Reservation::where('table_id', $selectedTableId)
+                ->where('status', 'confirmada')
                 ->whereDate('reservation_time', now()->toDateString())
                 ->first();
+
+            // Solo llenar cliente si no hay orden activa
+            if ($reservation && $reservation->table->hasActiveOrder($reservation)) {
+                $reservation = null;
+            }
         }
+
 
         return view('orders.create', compact('tables', 'productos', 'selectedTableId', 'reservation'));
     }
+
+
+
 
     /**
      * 🔵 Guardar una nueva orden en la base de datos.
@@ -108,6 +119,13 @@ class OrderController extends Controller
         // >>> Llamada al método del modelo para recalcular el total respetando la lógica
         // (por ejemplo: excluir items con status = 'cancelado')
         $order->calculateTotal();
+
+        // Cambiar estado de la mesa a 'Ocupada'
+        $table = Table::find($request->table_id);
+        if ($table) {
+            $table->status = 'Ocupada';
+            $table->save();
+        }
 
         return redirect()
             ->route('orders.show', $order->id)
@@ -284,7 +302,17 @@ class OrderController extends Controller
                 $order->status = 'completada';
                 $order->payment_status = 'pagado'; // opcional
                 $order->save();
-                return redirect()->back()->with('success', 'Orden marcada como completada.');
+
+                // 🔹 Liberar la mesa asociada
+                if ($order->table()->exists()) {
+                    $table = $order->table()->first();
+                    $table->status = 'Disponible';
+                    $table->save();
+                }
+
+
+
+                return redirect()->back()->with('success', 'Orden marcada como completada y mesa liberada.');
             }
 
             return redirect()->back()->with('error', 'No se puede completar la orden: algunos items no están listos.');
@@ -292,5 +320,6 @@ class OrderController extends Controller
 
         return redirect()->back();
     }
+
 
 }

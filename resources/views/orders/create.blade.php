@@ -72,9 +72,9 @@
                 <!-- Nombre del Cliente -->
                 <div>
                     <label class="text-sm text-neutral-500">Nombre del Cliente</label>
-                    <input type="text" name="client_name" 
-                        value="{{ $reservation->client_name ?? old('client_name') }}" 
-                        @if(isset($reservation)) readonly @endif
+                    <input type="text" name="client_name"
+                        value="{{ (isset($reservation) && $reservation->table_id == $selectedTableId) ? $reservation->client_name : old('client_name') }}"
+                        @if(isset($reservation) && $reservation->table_id == $selectedTableId) readonly @endif
                         placeholder="Ingrese el nombre del cliente"
                         class="mt-1 w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-4 py-2 text-sm">
                 </div>
@@ -82,13 +82,13 @@
                 <!-- Documento del Cliente -->
                 <div>
                     <label class="text-sm text-neutral-500">Documento</label>
-                    <input type="text" name="client_document" 
-                        value="{{ $reservation->client_document ?? old('client_document') }}" 
-                        @if(isset($reservation)) readonly @endif
+                    <input type="text" name="client_document"
+                        value="{{ (isset($reservation) && $reservation->table_id == $selectedTableId) ? $reservation->client_document : old('client_document') }}"
+                        @if(isset($reservation) && $reservation->table_id == $selectedTableId) readonly @endif
                         placeholder="Ingrese el documento del cliente"
                         class="mt-1 w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-4 py-2 text-sm">
                 </div>
-            </div>
+
 
         </div>
 

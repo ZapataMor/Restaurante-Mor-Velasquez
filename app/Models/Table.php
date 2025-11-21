@@ -37,9 +37,10 @@ class Table extends Model
         return $this->reservations()
             ->where('status', 'confirmada')
             ->where('reservation_time', '<=', $now)
-            ->where('reservation_time', '>=', $now->copy()->subMinutes(90))
+            ->where('reservation_time', '>=', $now->copy()->subHours(2)) // Igual que realStatus
             ->first();
     }
+
 
     public function futureReservation()
     {
@@ -76,11 +77,40 @@ class Table extends Model
 
 
     public function getActiveOrder()
-{
-    return $this->orders()
-        ->whereIn('status', ['abierta', 'en_proceso'])
-        ->first();
-}
+    {
+        return $this->orders()
+            ->whereIn('status', ['abierta', 'en_proceso'])
+            ->first();
+    }
+
+    public function realStatus()
+    {
+        $now = now();
+
+        $active = $this->reservations()
+                    ->where('status', 'confirmada')
+                    ->where('reservation_time', '<=', $now)
+                    ->where('reservation_time', '>=', $now->copy()->subHours(2)) // Ajusta duración
+                    ->first();
+
+        if ($active) return 'Ocupada';
+
+        $future = $this->reservations()
+                    ->where('status', 'confirmada')
+                    ->where('reservation_time', '>', $now)
+                    ->first();
+
+        if ($future) return 'Reservada';
+
+        $activeOrder = $this->orders()
+                            ->whereIn('status', ['abierta', 'en_proceso'])
+                            ->exists();
+
+        if ($activeOrder) return 'Ocupada';
+
+        return 'Disponible';
+    }
+
 
 
 

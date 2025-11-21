@@ -76,9 +76,10 @@
                                 $end   = strtotime("23:00");
                                 while ($start <= $end) {
                                     echo '<option value="' . date("H:i", $start) . '">' . date("H:i", $start) . '</option>';
-                                    $start = strtotime("+90 minutes", $start);
+                                    $start = strtotime("+30 minutes", $start); // cada media hora
                                 }
                             @endphp
+
 
                         </select>
                     </div>

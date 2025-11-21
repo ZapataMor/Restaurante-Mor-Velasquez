@@ -123,91 +123,59 @@ class TableController extends Controller
 
     public function map()
     {
-        $now = now();
-
         // Carga reservas y órdenes
         $tables = Table::with(['reservations', 'orders'])->get();
 
-        foreach ($tables as $table) {
+        $now = now();
 
-            /** -------------------------------
-             * 1. RESERVA ACTIVA
-             * -------------------------------- */
+        foreach ($tables as $table) {
+            // Reservas activas y futuras
             $activeReservation = $table->activeReservation();
             $table->activeReservation = $activeReservation;
-
             $table->active_duration = $activeReservation
                 ? $activeReservation->reservation_time->diffInMinutes($now)
                 : null;
 
-
-            /** -------------------------------
-             * 2. RESERVA FUTURA
-             * -------------------------------- */
             $futureReservation = $table->futureReservation();
             $table->futureReservation = $futureReservation;
-
             $table->future_in_minutes = $futureReservation
                 ? $now->diffInMinutes($futureReservation->reservation_time)
                 : null;
 
-
-            /** -------------------------------
-             * 3. ORDEN ACTIVA
-             * (usa tu función del modelo)
-             * -------------------------------- */
-            $activeOrder = $table->hasActiveOrder($activeReservation);
-
-            /** -------------------------------
-             * 4. ESTADO FINAL DE LA MESA
-             * -------------------------------- */
-            if ($activeReservation || $activeOrder) {
-                $table->status = 'Ocupada';
-
-            } elseif ($futureReservation) {
-                $table->status = 'Reservada';
-
-            } else {
-                $table->status = 'Disponible';
-            }
+            // ✅ ya no se toca $table->status
+            // Todo lo relativo a mostrar si está ocupada o reservada lo hace $table->realStatus() en la vista
         }
 
         return view('tables.map', compact('tables'));
     }
 
 
-
-
-
    public function assign($reservationId)
     {
         $reservation = Reservation::findOrFail($reservationId);
 
-        // Convertir la hora a Carbon real
         $resTime = \Carbon\Carbon::parse($reservation->reservation_time);
 
         $waiters = User::where('role', 'mesero')
-               ->where('active', true)
-               ->get();
+                    ->where('active', true)
+                    ->get();
 
         $tables = Table::where('capacity', '>=', $reservation->people_count)
             ->whereDoesntHave('reservations', function ($query) use ($resTime) {
-
-                // MOSTRAR mesas que NO tengan una reserva en un rango de 2 horas
-                $query->whereBetween('reservation_time', [
-                    $resTime->copy()->subHours(2),
-                    $resTime->copy()->addHours(2),
-                ]);
-
+                $query->where('status', 'confirmada')
+                    ->whereBetween('reservation_time', [
+                        $resTime->copy()->subHours(2),
+                        $resTime->copy()->addHours(2),
+                    ]);
+            })
+            ->whereDoesntHave('orders', function ($query) {
+                $query->whereIn('status', ['abierta', 'en_proceso']);
             })
             ->get();
 
+
         return view('tables.assign', compact('reservation', 'tables', 'waiters'));
     }
-
-
-
-
 
     public function assignStore(Request $request, $reservationId)
     {

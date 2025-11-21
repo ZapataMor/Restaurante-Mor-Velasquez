@@ -66,17 +66,20 @@
                         'Reservada' => 'bg-yellow-500',
                         'Necesita Limpieza' => 'bg-gray-500',
                     ];
+
+                    // ✅ Aquí calculas el estado real de la mesa
+                    $status = $table->realStatus();
                 @endphp
 
-                <div class="bg-white dark:bg-neutral-900 rounded-2xl border-2 {{ $borderColors[$table->status] ?? 'border-gray-500' }} 
+                <div class="bg-white dark:bg-neutral-900 rounded-2xl border-2 {{ $borderColors[$status] ?? 'border-gray-500' }} 
                     p-6 shadow-sm hover:shadow-md transition hover:scale-[1.02] flex flex-col items-center text-center">
 
                     <!-- Número de mesa -->
                     <p class="text-3xl font-bold mb-3">Mesa {{ $table->number }}</p>
 
                     <!-- Estado -->
-                    <span class="text-xs text-white px-2 py-1 rounded {{ $badgeColors[$table->status] }}">
-                        {{ $table->status }}
+                    <span class="text-xs text-white px-2 py-1 rounded {{ $badgeColors[$status] }}">
+                        {{ $status }}
                     </span>
 
                     <!-- Capacidad -->
@@ -85,7 +88,7 @@
                     </p>
 
                     <!-- 🔴 Ocupada actualmente -->
-                    @if($table->status === 'Ocupada' && $table->active_duration)
+                    @if($status === 'Ocupada' && $table->active_duration)
                         @php
                             $minutes = ceil($table->active_duration);
                         @endphp
@@ -96,7 +99,7 @@
                     @endif
 
                     <!-- 🟡 Reservada para después -->
-                    @if($table->status === 'Reservada' && $table->future_in_minutes)
+                    @if($status === 'Reservada' && $table->future_in_minutes)
                         @php
                             $minutes = ceil($table->future_in_minutes);
                         @endphp
@@ -149,9 +152,23 @@
                             $activeOrder = $table->activeOrder();
 
                             if ($user->role === 'mesero') {
-                                if ($table->status === 'Ocupada' && !$activeOrder) $canAccess = true;
-                                if ($activeOrder && $activeOrder->user_id === $user->id) $canRelease = true;
+
+                                // 🟢 Mesas disponibles → el mesero puede crear una orden
+                                if ($status === 'Disponible') {
+                                    $canAccess = true;
+                                }
+
+                                // 🟡 Mesa ocupada SIN orden → permitir tomar orden
+                                if ($status === 'Ocupada' && !$activeOrder) {
+                                    $canAccess = true;
+                                }
+
+                                // 🔴 Solo el mesero dueño de la orden puede liberar la mesa
+                                if ($activeOrder && $activeOrder->user_id === $user->id) {
+                                    $canRelease = true;
+                                }
                             }
+
                         @endphp
 
                         {{-- 🟢 Crear una orden --}}
