@@ -97,6 +97,7 @@
                                     <option value="pendiente"   {{ $item->status === 'pendiente' ? 'selected' : '' }}>Pendiente</option>
                                     <option value="preparando"  {{ $item->status === 'preparando' ? 'selected' : '' }}>En Preparación</option>
                                     <option value="listo"       {{ $item->status === 'listo' ? 'selected' : '' }}>Listo</option>
+                                    <option value="cancelado"   {{ $item->status === 'cancelado' ? 'selected' : '' }}>Cancelado</option>
                                 </select>
                             </div>
 
@@ -204,6 +205,7 @@
                         <option value="pendiente" selected>Pendiente</option>
                         <option value="preparando">En Preparación</option>
                         <option value="listo">Listo</option>
+                        <option value="cancelado">Cancelado</option>
                     </select>
                 </div>
 

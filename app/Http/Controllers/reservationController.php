@@ -24,14 +24,44 @@ class ReservationController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'client_name'      => 'required|string|max:255',
-            'client_contact'   => 'required|string|max:20',
-            'client_document' => 'required|string|max:20',
-            'reservation_date' => 'required|date',
-            'reservation_time' => 'required',
-            'people_count'     => 'required|integer|min:1',
-            // ❌ El cliente NO asigna mesa, así que no se valida aquí
-            'notes'            => 'nullable|string',
+            'client_name' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/\s+/' // Debe tener nombre y apellido
+            ],
+            'client_contact' => [
+                'required',
+                'regex:/^3(0[0-9]|1[0-9]|2[0-9]|5[0-9])[0-9]{7}$/'
+                // 300–399, pero controlado a rangos reales utilizados en Colombia
+            ],
+            'client_document' => [
+                'required',
+                'digits_between:8,15'
+            ],
+            'reservation_date' => [
+                'required',
+                'date',
+                'after_or_equal:today'
+            ],
+            'reservation_time' => [
+                'required'
+            ],
+            'people_count' => [
+                'required',
+                'integer',
+                'min:1'
+            ],
+            'notes' => [
+                'nullable',
+                'string'
+            ],
+        ], [
+            // 🟡 Mensajes personalizados (opcional pero más elegante)
+            'client_name.regex' => 'El nombre debe incluir al menos un apellido.',
+            'client_contact.regex' => 'Debe ingresar un número colombiano válido (300–351, 310–320, etc).',
+            'client_document.digits_between' => 'El documento debe tener al menos 8 dígitos.',
+            'reservation_date.after_or_equal' => 'La fecha no puede ser anterior a hoy.',
         ]);
 
         // Combinar fecha y hora
@@ -39,23 +69,21 @@ class ReservationController extends Controller
             $request->reservation_date . ' ' . $request->reservation_time
         );
 
-        // Crear la reserva SIN MESA por ahora
         Reservation::create([
             'client_name'      => $request->client_name,
             'client_contact'   => $request->client_contact,
-            'client_document' => $request->client_document,
+            'client_document'  => $request->client_document,
             'reservation_time' => $reservationDateTime,
             'people_count'     => $request->people_count,
             'notes'            => $request->notes,
-            
-            //❗ La mesa y el msero quedan pendientes para que el recepcionista la asigne
-            'user_id'          => null,
-            'table_id'         => null,
+            'user_id'          => null, // mesero pendiente
+            'table_id'         => null, // mesa pendiente
         ]);
 
         return redirect()->route('consultar.reserva')
                         ->with('success', '✅ Reserva registrada correctamente. Mesa pendiente por asignar.');
     }
+
 
 
     /**

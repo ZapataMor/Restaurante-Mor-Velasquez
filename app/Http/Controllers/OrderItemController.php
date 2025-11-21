@@ -34,13 +34,13 @@ class OrderItemController extends Controller
             'order_id'   => $order->id,
             'product_id' => $product->id,
             'price'      => $product->price,
-            'total'      => $product->price,
+            'total'      => $product->price, // Mantener la lógica que ya tenías
             'notes'      => $request->notes,
             'status'     => 'pendiente', // estado inicial
         ]);
 
-        // Actualizar total de la orden
-        $this->updateOrderTotal($order);
+        // Llamar al método del modelo para recalcular el total (excluye items cancelados)
+        $order->calculateTotal();
 
         return redirect()->route('orders.edit', $order->id)
                          ->with('success', '✅ Producto agregado a la orden.');
@@ -72,13 +72,13 @@ class OrderItemController extends Controller
         $orderItem->update([
             'product_id' => $product->id,
             'price'      => $product->price,
-            'total'      => $product->price,
+            'total'      => $product->price, // Mantener la lógica actual (si quieres multiplicar por qty, ajusta aquí)
             'notes'      => $request->notes,
             'status'     => $request->status,
         ]);
 
-        // Actualizar total de la orden
-        $this->updateOrderTotal($orderItem->order);
+        // Llamar al método del modelo para recalcular el total
+        $orderItem->order->calculateTotal();
 
         return redirect()->route('orders.edit', $orderItem->order->id)
                          ->with('success', '✅ Producto de la orden actualizado.');
@@ -92,19 +92,20 @@ class OrderItemController extends Controller
         $order = $orderItem->order;
         $orderItem->delete();
 
-        // Actualizar total de la orden
-        $this->updateOrderTotal($order);
+        // Llamar al método del modelo para recalcular el total
+        $order->calculateTotal();
 
         return redirect()->route('orders.edit', $order->id)
                          ->with('success', '✅ Producto eliminado de la orden.');
     }
 
     /**
-     * 🔹 Actualiza el total de la orden sumando todos sus items.
+     * 🔹 (Wrapper opcional) Actualiza el total de la orden usando el método del modelo.
+     *       No es estrictamente necesario si llamas directamente a calculateTotal(),
+     *       pero lo dejo como helper por compatibilidad.
      */
     protected function updateOrderTotal(Order $order)
     {
-        $total = $order->order_items()->sum('total');
-        $order->update(['total_amount' => $total]);
+        $order->calculateTotal();
     }
 }

@@ -45,6 +45,15 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function calculateTotal()
+    {
+        $this->total_amount = $this->orderItems()
+            ->where('status', '!=', 'cancelado')
+            ->sum('total');
+
+        $this->save();
+    }
+
     // Orden puede tener una factura
     public function invoice()
     {

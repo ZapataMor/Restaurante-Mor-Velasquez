@@ -45,6 +45,14 @@
                         {{ $order->created_at->format('d M Y - H:i') }}
                     </p>
                 </div>
+
+                <!-- ✅ TOTAL A PAGAR -->
+                <div>
+                    <p class="text-sm text-neutral-500">Total a Pagar</p>
+                    <p class="mt-1 text-neutral-700 dark:text-neutral-200 font-semibold">
+                        ${{ number_format($order->total_amount, 0, ',', '.') }}
+                    </p>
+                </div>
             </div>
         </div>
 
@@ -62,12 +70,16 @@
                     </div>
 
                     <span class="px-2 py-1 text-xs rounded-full text-white
-                        {{ $item->status === 'pendiente' ? 'bg-gray-500' :
-                        ($item->status === 'preparando' ? 'bg-yellow-500' :
-                        ($item->status === 'listo' ? 'bg-green-900' :
-                        'bg-gray-300')) }}">
+                        {{
+                            $item->status === 'pendiente' ? 'bg-gray-500' :
+                            ($item->status === 'preparando' ? 'bg-yellow-500' :
+                            ($item->status === 'listo' ? 'bg-green-900' :
+                            ($item->status === 'cancelado' ? 'bg-red-600' :
+                            'bg-gray-300')))
+                        }}">
                         {{ $item->status }}
                     </span>
+
 
                 </div>
             @empty
@@ -87,8 +99,11 @@
 
                     <!-- Botón Marcar como Completada solo si todos los items están listos -->
                     @php
-                        $allReady = $order->orderItems->every(fn($item) => $item->status === 'listo')
+                        $allReady = $order->orderItems->every(fn($item) =>
+                            in_array($item->status, ['listo', 'cancelado'])
+                        );
                     @endphp
+
 
                     <form action="{{ route('orders.updateStatus', $order->id) }}" method="POST" class="flex-1">
                         @csrf

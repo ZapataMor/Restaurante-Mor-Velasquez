@@ -93,14 +93,20 @@
                                     </div>
                                     <span class="px-2 py-1 text-xs rounded-full
                                         {{
-                                            $item->status === 'pendiente' ? 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300' :
-                                            ($item->status === 'preparando' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' :
-                                            ($item->status === 'listo' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
-                                            'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300'))
+                                            $item->status === 'pendiente' 
+                                                ? 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                                            : ($item->status === 'preparando'
+                                                ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300'
+                                            : ($item->status === 'listo'
+                                                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                                            : ($item->status === 'cancelado'
+                                                ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                                            : 'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300')))
                                         }}
                                     ">
                                         {{ $item->status }}
                                     </span>
+
 
 
                                 </div>

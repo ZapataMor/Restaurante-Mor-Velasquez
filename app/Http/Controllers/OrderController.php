@@ -42,8 +42,6 @@ class OrderController extends Controller
         return view('orders.create', compact('tables', 'productos', 'selectedTableId', 'reservation'));
     }
 
-
-
     /**
      * 🔵 Guardar una nueva orden en la base de datos.
      */
@@ -79,12 +77,11 @@ class OrderController extends Controller
             'client_document' => $request->client_document,
         ]);
 
-        // Para acumular total de la orden
+        // Para acumular total de la orden (temporal)
         $totalOrder = 0;
 
         // Guardar cada item
         foreach ($request->items as $item) {
-
             // Obtener el producto
             $product = Product::findOrFail($item['product_id']);
 
@@ -96,24 +93,26 @@ class OrderController extends Controller
 
             // Guardar item con su total
             $order->orderItems()->create([
-                'product_id' => $product->id,          // CORREGIDO
+                'product_id' => $product->id,
                 'quantity'   => $item['quantity'],
                 'price'      => $product->price,
                 'notes'      => $item['notes'] ?? null,
-                'total'      => $lineTotal,            // OPCIÓN 1
+                'total'      => $lineTotal,
+                'status'     => 'pendiente',
             ]);
         }
 
-        // Actualizar el total de la orden
+        // Actualizar el total de la orden (valor provisional)
         $order->update(['total_amount' => $totalOrder]);
+
+        // >>> Llamada al método del modelo para recalcular el total respetando la lógica
+        // (por ejemplo: excluir items con status = 'cancelado')
+        $order->calculateTotal();
 
         return redirect()
             ->route('orders.show', $order->id)
             ->with('success', '✅ Orden creada correctamente.');
     }
-
-
-
 
     /**
      * 🟣 Mostrar una orden específica con sus items.
@@ -141,7 +140,6 @@ class OrderController extends Controller
 
         return view('orders.edit', compact('order', 'tables', 'reservations', 'meseros', 'productos'));
     }
-
 
     /**
      * 🟢 Actualizar una orden.
@@ -178,16 +176,19 @@ class OrderController extends Controller
         // 🔥 ACTUALIZAR ITEMS
         $totalOrder = 0;
 
-        foreach ($request->items as $itemKey => $data) {
-            
+        // Aseguramos que $request->items exista para evitar errores si no se envía
+        $items = $request->input('items', []);
+
+        foreach ($items as $itemKey => $data) {
+
             // 🔑 Diferenciar entre items nuevos y existentes
             // Si el key empieza con "new_", es un item nuevo
             if (str_starts_with($itemKey, 'new_')) {
-                
+
                 // 🟢 Item nuevo → se crea
                 $product = Product::findOrFail($data['product_id']);
-                $lineTotal = $product->price * $data['quantity'];
-                
+                $lineTotal = $product->price * ($data['quantity'] ?? 1);
+
                 OrderItem::create([
                     'order_id'   => $order->id,
                     'product_id' => $data['product_id'],
@@ -197,18 +198,18 @@ class OrderController extends Controller
                     'status'     => $data['status'] ?? 'pendiente',
                     'total'      => $lineTotal,
                 ]);
-                
+
                 $totalOrder += $lineTotal;
-                
+
             } else {
-                
+
                 // 🔵 Item existente → se actualiza
                 $orderItem = OrderItem::find($itemKey);
-                
+
                 if ($orderItem && $orderItem->order_id == $order->id) {
                     $product = Product::findOrFail($data['product_id']);
-                    $lineTotal = $product->price * $data['quantity'];
-                    
+                    $lineTotal = $product->price * ($data['quantity'] ?? $orderItem->quantity);
+
                     $orderItem->update([
                         'product_id' => $data['product_id'],
                         'quantity'   => $data['quantity'],
@@ -217,19 +218,22 @@ class OrderController extends Controller
                         'status'     => $data['status'] ?? $orderItem->status,
                         'total'      => $lineTotal,
                     ]);
-                    
+
                     $totalOrder += $lineTotal;
                 }
             }
         }
 
-        // 🔥 Actualizar total de la orden
+        // 🔥 Actualizar total provisional de la orden (por compatibilidad)
         $order->update(['total_amount' => $totalOrder]);
+
+        // >>> Llamada al método del modelo para recalcular el total definitivo
+        // (esto asegurará que items con status = 'cancelado' no se incluyan)
+        $order->calculateTotal();
 
         return redirect()->route('orders.show', $order->id)
                         ->with('success', '✅ Orden actualizada correctamente.');
     }
-
 
     /**
      * 🔴 Eliminar una orden.
@@ -250,6 +254,9 @@ class OrderController extends Controller
             return redirect()->back()->with('info', '⚠️ Esta orden ya está completada.');
         }
 
+        // Asegurar total actualizado antes de cerrar
+        $order->calculateTotal();
+
         $order->update([
             'status' => 'completada',
             'payment_status' => 'pagado',
@@ -259,13 +266,23 @@ class OrderController extends Controller
                         ->with('success', '✅ La orden ha sido completada y la mesa liberada.');
     }
 
-   public function updateStatus(Request $request, Order $order)
+    /**
+     * Actualizar solo el estado (ruta patch)
+     */
+    public function updateStatus(Request $request, Order $order)
     {
         $order->load('orderItems'); // cargar los items
 
         if ($request->input('status') === 'completada') {
-            if ($order->orderItems->every(fn($item) => $item->status === 'listo')) {
+
+            // 🔥 ACEPTAR "listo" Y "cancelado" COMO VALIDOS PARA COMPLETAR LA ORDEN
+            $allReady = $order->orderItems->every(function ($item) {
+                return in_array($item->status, ['listo', 'cancelado']);
+            });
+
+            if ($allReady) {
                 $order->status = 'completada';
+                $order->payment_status = 'pagado'; // opcional
                 $order->save();
                 return redirect()->back()->with('success', 'Orden marcada como completada.');
             }
@@ -275,8 +292,5 @@ class OrderController extends Controller
 
         return redirect()->back();
     }
-
-
-
 
 }
