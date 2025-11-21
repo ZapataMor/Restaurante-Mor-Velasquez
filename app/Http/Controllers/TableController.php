@@ -60,7 +60,7 @@ class TableController extends Controller
      */
     public function edit(Table $table)
     {
-        return view('tables.edit', compact('table'));
+        return view('tables.update', compact('table'));
     }
 
     /**

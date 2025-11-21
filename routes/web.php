@@ -10,6 +10,7 @@ use App\Http\Controllers\TableController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PublicController;
+use App\Http\Controllers\UserController;
 use App\Livewire\Settings\{Appearance, Password, Profile, TwoFactor};
 
 /*
@@ -58,6 +59,21 @@ Route::middleware(['auth'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | 👥 Usuarios (Personal/Meseros)
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('users')->name('users.')->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('index');
+        Route::get('/create', [UserController::class, 'create'])->name('create');
+        Route::post('/', [UserController::class, 'store'])->name('store');
+        Route::get('/{user}', [UserController::class, 'show'])->name('show');
+        Route::get('/{user}/edit', [UserController::class, 'edit'])->name('edit');
+        Route::put('/{user}', [UserController::class, 'update'])->name('update');
+        Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
     | 🍽️ Órdenes
     |--------------------------------------------------------------------------
     */
@@ -92,7 +108,6 @@ Route::middleware(['auth'])->group(function () {
         });
     });
 
-
     /*
     |--------------------------------------------------------------------------  
     | 🪑 Mesas  
@@ -119,7 +134,6 @@ Route::middleware(['auth'])->group(function () {
 
         Route::post('/assign/{reservation}', [TableController::class, 'assignStore'])
             ->name('assign.store');
-
 
         // API para mesas disponibles
         Route::get('/api/available', [TableController::class, 'available'])->name('api.available');
@@ -197,8 +211,5 @@ Route::middleware(['auth'])->group(function () {
             )
             ->name('two-factor.show');
     });
-
-
-    
 
 });

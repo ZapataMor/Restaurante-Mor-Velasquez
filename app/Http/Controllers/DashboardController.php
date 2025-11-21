@@ -24,10 +24,11 @@ class DashboardController extends Controller
         $stats = [
             'orders_today'       => Order::whereDate('created_at', today())->count(),
             'sales_today'        => Invoice::where('status', 'Pagada')
-                                           ->whereDate('created_at', today())
-                                           ->sum('total'),
+                                            ->whereDate('created_at', today())
+                                            ->sum('total'),
             'reservations_today' => Reservation::whereDate('reservation_time', today())->count(),
             'tables_occupied'    => Table::where('status', 'Ocupada')->count(),
+            'total_tables'       => Table::count(),
         ];
 
         // ============================
