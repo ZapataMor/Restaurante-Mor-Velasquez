@@ -268,6 +268,9 @@ class OrderController extends Controller
             'payment_status' => 'pagado',
         ]);
 
+        // 🔥 Obtener la mesa UNA SOLA VEZ para optimizar
+        $table = Table::find($order->table_id);
+
         // 🔥 IMPORTANTE: Marcar la reserva como completada
         if ($order->reservation_id) {
             $reservation = Reservation::find($order->reservation_id);
@@ -275,16 +278,17 @@ class OrderController extends Controller
                 $reservation->update(['status' => 'completada']);
             }
         }
-        
-        // 🔥 ALTERNATIVA: Si no hay reservation_id pero la mesa tiene una reserva confirmada
-        if (!$order->reservation_id && $order->table_id) {
-            $table = Table::find($order->table_id);
-            if ($table) {
-                $activeReservation = $table->activeReservation();
-                if ($activeReservation) {
-                    $activeReservation->update(['status' => 'completada']);
-                }
+        // 🔥 ALTERNATIVA: Si no hay reservation_id pero la mesa tiene una reserva confirmada para hoy
+        else if ($table) {
+            $activeReservation = $table->activeReservation();
+            if ($activeReservation) {
+                $activeReservation->update(['status' => 'completada']);
             }
+        }
+
+        // 🔥 SIEMPRE actualizar el estado de la mesa a 'Disponible'
+        if ($table) {
+            $table->update(['status' => 'Disponible']);
         }
 
         return redirect()
@@ -310,6 +314,9 @@ class OrderController extends Controller
                 $order->payment_status = 'pagado';
                 $order->save();
 
+                // 🔥 Obtener la mesa UNA SOLA VEZ
+                $table = Table::find($order->table_id);
+
                 // 🔥 Marcar la reserva asociada como completada
                 if ($order->reservation_id) {
                     $reservation = Reservation::find($order->reservation_id);
@@ -317,16 +324,17 @@ class OrderController extends Controller
                         $reservation->update(['status' => 'completada']);
                     }
                 }
-                
                 // 🔥 ALTERNATIVA: Si no hay reservation_id pero la mesa tiene una reserva confirmada
-                if (!$order->reservation_id && $order->table_id) {
-                    $table = Table::find($order->table_id);
-                    if ($table) {
-                        $activeReservation = $table->activeReservation();
-                        if ($activeReservation) {
-                            $activeReservation->update(['status' => 'completada']);
-                        }
+                else if ($table) {
+                    $activeReservation = $table->activeReservation();
+                    if ($activeReservation) {
+                        $activeReservation->update(['status' => 'completada']);
                     }
+                }
+
+                // 🔥 SIEMPRE actualizar el estado de la mesa a 'Disponible'
+                if ($table) {
+                    $table->update(['status' => 'Disponible']);
                 }
 
                 return redirect()->back()->with('success', '✅ Orden completada y mesa liberada.');

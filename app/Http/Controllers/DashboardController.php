@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Invoice;
+use App\Models\OrderItem;
 use App\Models\Reservation;
 use App\Models\Table;
 use App\Models\Product;
@@ -28,7 +29,15 @@ class DashboardController extends Controller
                                             ->sum('total'),
             'reservations_today' => Reservation::whereDate('reservation_time', today())->count(),
             'tables_occupied'    => Table::where('status', 'Ocupada')->count(),
+<<<<<<< HEAD
             'total_tables'       => Table::count(),
+=======
+            'completed_today'    => Order::whereDate('updated_at', today())
+                                        ->where('status', 'completada')
+                                        ->count(),
+            'pending_orders'     => Order::whereIn('status', ['abierta','en_proceso'])
+                                        ->count(),
+>>>>>>> 74b1dc1794d4de954dcae3e87e87c999bacbd4ad
         ];
 
         // ============================
@@ -121,15 +130,25 @@ class DashboardController extends Controller
                 ));
 
             case 'chef':
-                // Ejemplo: vista con órdenes en cocina
-                $kitchenOrders = Order::whereIn('status', ['en_proceso'])
+                // Traemos todas las órdenes abiertas o en proceso
+                $chefOrders = Order::whereIn('status', ['abierta', 'en_proceso'])
                     ->with(['table', 'orderItems.product'])
+                    ->latest()
                     ->get();
 
-                return view('dashboard.chef.index', compact(
-                    'stats',
-                    'kitchenOrders'
-                ));
+                // Estadísticas rápidas basadas en items de las órdenes
+                $stats = [
+                    'total_items'      => $chefOrders->sum(fn($order) => $order->orderItems->count()),
+                    'pending_items'    => $chefOrders->sum(fn($order) => $order->orderItems->where('status', 'pendiente')->count()),
+                    'preparing_items'  => $chefOrders->sum(fn($order) => $order->orderItems->where('status', 'preparando')->count()),
+                    'ready_today'      => OrderItem::where('status', 'listo')
+                                                ->whereDate('updated_at', today())
+                                                ->count(),
+                ];
+
+                return view('dashboard.chef.index', compact('chefOrders', 'stats'));
+
+
 
             case 'admin':
             default:

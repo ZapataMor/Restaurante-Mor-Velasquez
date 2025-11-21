@@ -59,18 +59,18 @@ class Table extends Model
             return 'Ocupada'; // El cliente llegó, está ocupada
         }
 
-        // 🟡 PRIORIDAD 3: Si tiene una reserva confirmada PRÓXIMA (aún no llega la hora)
+        // 🟡 PRIORIDAD 3: Si tiene una reserva confirmada PRÓXIMA (dentro de 30 minutos o menos)
         $upcomingReservation = $this->reservations()
             ->where('status', 'confirmada')
             ->whereDate('reservation_time', $now->toDateString())
             ->whereBetween('reservation_time', [
                 $now->copy()->addMinutes(1),  // Desde 1 minuto en el futuro
-                $now->copy()->addHours(24)     // Hasta el final del día
+                $now->copy()->addMinutes(30)   // Hasta 30 minutos en el futuro
             ])
             ->first();
 
         if ($upcomingReservation) {
-            return 'Reservada'; // Tiene una reserva pero aún no llega la hora
+            return 'Reservada'; // Tiene una reserva próxima (≤30 min)
         }
 
         // 🟢 PRIORIDAD 4: Si no hay órdenes activas ni reservas confirmadas, está DISPONIBLE
@@ -118,7 +118,7 @@ class Table extends Model
     }
 
     /**
-     * Obtiene reservas futuras (próximas en el día)
+     * Obtiene reservas futuras próximas (dentro de 30 minutos)
      */
     public function futureReservation()
     {
@@ -127,7 +127,10 @@ class Table extends Model
         return $this->reservations()
             ->where('status', 'confirmada')
             ->whereDate('reservation_time', $now->toDateString())
-            ->where('reservation_time', '>', $now)
+            ->whereBetween('reservation_time', [
+                $now->copy()->addMinutes(1),
+                $now->copy()->addMinutes(30)
+            ])
             ->orderBy('reservation_time')
             ->first();
     }

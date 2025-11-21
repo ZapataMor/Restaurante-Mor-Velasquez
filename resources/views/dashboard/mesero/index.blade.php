@@ -119,16 +119,6 @@
                                class="flex-1 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-center rounded-xl transition text-sm font-medium">
                                 Ver Detalles
                             </a>
-                            @if($order->status === 'En Vista')
-                                <form action="{{ route('orders.updateStatus', $order->order_id) }}" method="POST" class="flex-1">
-                                    @csrf
-                                    @method('PATCH')
-                                    <input type="hidden" name="status" value="Confirmada">
-                                    <button type="submit" class="w-full px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl transition text-sm font-medium">
-                                        Confirmar
-                                    </button>
-                                </form>
-                            @endif
                         </div>
                     </div>
                 @empty
@@ -139,8 +129,8 @@
                             </svg>
                         </div>
                         <p class="text-neutral-600 dark:text-neutral-400 mb-4">No tienes órdenes activas en este momento</p>
-                        <a href="{{ route('orders.create') }}" class="inline-block px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition">
-                            Crear Nueva Orden
+                        <a href="{{ route('tables.map') }}" class="inline-block px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition">
+                            Ir al mapa de las mesas
                         </a>
                     </div>
                 @endforelse
